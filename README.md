@@ -1,5 +1,9 @@
 # Aktivkohlefilter-Einsatz (Passivlüftung mit aktiven Absaugungen)
 
+**Version: 1.0.2** (im Script als `VERSION`-Konstante; wird als Gravur auf
+den +Y-Flanschüberstand aufgebracht und muss beim Bump synchron mitgeführt
+werden: `carbon_filter_build123d.py` → README → git-Tag).
+
 Parametrischer Filterkorb (Grundkörper + Deckel) für Wohnungslüftung durch
 Aktivkohle, ausgelegt für HP Multi Jet Fusion in **PA11** (BASF Ultrasint PA11
 oder vergleichbar).
@@ -72,6 +76,24 @@ durch den Schaum.
   unten dienen als Fingergriff (Daumen oben, Zeigefinger unten, ziehen)
 - Aktivkohlebett-Tiefe: **29.3 mm** (= Z − Boden − Deckel − 2 × 3 mm Filtervlies)
 
+### Versionsgravur
+
+Der `VERSION`-String aus dem Script wird als 0.6 mm tiefe Vertiefung
+(Font-Size 5 mm) auf die **Apartment-seitige Fläche des +Y-Flansch­überstands**
+graviert. Position: Z = 0 … 0.6 mm, vertikal zentriert auf der Mittellinie des
+10 mm breiten Überstands. Die Stelle ist solid (keine Hex-Löcher, keine
+Snap-Schlitze), in der Sichtlinie des Benutzers, und die 1.6 mm Restboden
+unter der Gravur liegt komfortabel über dem MJF-Minimum von 1.0 mm.
+
+Die Gravur-Ebene ist bewusst gespiegelt konstruiert (Plane mit `z_dir=-Z`
+und `x_dir=-X`, sodass `y_dir=+Y` rechtshändig bleibt), damit der Text von
+der Apartment-Seite aus korrekt lesbar ist — aus −Z-Blickrichtung wäre ein
+Standard-Plane.XY-Sketch nämlich spiegelverkehrt dargestellt.
+
+Beim Versionswechsel muss die `VERSION`-Konstante im Script-Header **und**
+die Angabe oben im README synchron nachgezogen werden (plus git-Tag beim
+Release).
+
 ### Deckel und Schnappverbindung
 
 - Deckel 2.5 mm dick, Oberseite bündig mit der Trog-Oberkante
@@ -113,7 +135,38 @@ automatisch die Exporte in `output/STEP/` (für STEP) und `output/STL/`
 `EXPLODED = True` hebt den Deckel 30 mm über den Trog; für die
 Zusammenbau-Ansicht auf `False` setzen.
 
+### Mesh-Heal für STL-Export (pymeshfix)
+
+Die OCCT-STL-Tessellation hinterlässt typischerweise ~0.02 % nicht-manifold
+Kanten und Selbstdurchdringungen an Tangenten­nähten von Fillets/Chamfers —
+Druck-Bureau-Slicer (Shapeways/Sculpteo/Protolabs) lehnen solche Meshes ab
+oder heilen automatisch mit ungewissem Ergebnis. Der Export ruft deshalb
+`_heal_stl()` nach dem `export_stl()` auf (Dependency: `pymeshfix`).
+
+Verhalten:
+
+- **trough.stl**: typischerweise 1 Randloop + ~300 Selbstdurchdringungen
+  → nach Heal **0 / 0**, Volumen-Erhalt ≤ 0.5 %. Clean für Upload.
+- **lid.stl**: typischerweise 0 Randloops + ~80 Selbstdurchdringungen.
+  Hier schlägt die Heal-Kaskade fehl — die Durchdringungen sitzen
+  topologisch fundamental (hex-perforierte Platte + Snap-Arm-Wurzel),
+  pymeshfix's `strong_intersection_removal` kaskadiert in Komponenten­verlust
+  (Volumen fällt von 7.25 auf 0.04 cm³). Der Volumen-Wächter (≤ 5 %
+  Abnahme) bricht deshalb ab und behält das Original.
+
+**Upload-Empfehlung** (Stand 2026-04-18, ein Bureau-Round):
+
+- `trough.stl` (geheilt) → akzeptiert.
+- `lid.stl` (ungeheilt, 83 Selbstdurchdringungen ~2.5 %) → ebenfalls
+  akzeptiert; das Bureau-Auto-Heal kommt damit klar.
+- `lid.step` bleibt als clean-by-construction-Option verfügbar, aber nicht
+  nötig für den Upload.
+
+Dependency: `pip install pymeshfix`.
+
 ## MJF-Optimierungen
+
+### Grundparameter
 
 | Bereich | Wert | Grund |
 |---|---|---|
@@ -125,6 +178,71 @@ Zusammenbau-Ansicht auf `False` setzen.
 | Armwurzel-Fillet | 0.5 mm | Kerbspannungsreduktion → Dauerfestigkeit des Snap-Arms |
 | Snap-Mechanik | 2 Durchbrüche an X-Seiten | Keine Powder-Traps, klares Click-Feedback, reversibel |
 | Entpulvern | Hex oben + unten durchgehend | Pulver rieselt frei durch die Kassette |
+
+### DFM im Detail: 90°-Kanten-Rundungen und -Fasen
+
+MJF-PA11 prüft keine scharfen Kanten in der Druckbarkeit — der Prozess druckt
+Kanten so scharf wie das Laserscanfeld. Rundungen und Fasen werden eingesetzt,
+um **(a)** Spannungskonzentrationen an konkaven Innenkanten zu reduzieren,
+**(b)** Anfassbarkeit/Taktilität zu verbessern, **(c)** das Entpulvern zu
+erleichtern und **(d)** Risiken beim Handling (Absplittern, scharfe Kanten)
+zu vermeiden.
+
+| Kante / Feature | Operation | Radius | Begründung | Status |
+|---|---|---|---|---|
+| Körper-Senkrechtkanten (4 vertikale X/Y-Ecken) | Fillet | 2.0 mm | Haupt-Oberflächenqualität, Hand-Kontaktkanten | ✓ |
+| Flansch-Unterseite (4 Aussenkanten bei Z=0) | Chamfer | 0.8 mm | Fingergriff-Seite, verhindert Absplittern beim Einschub, keine scharfe Kante gegen Finger | ✓ |
+| Flansch-Y-Step (2 gerade Kanten bei Z=floor, Y=±size_y/2) | Fillet | 1.0 mm | Konkaver 90°-Innenwinkel zwischen Körper-Seitenwand und Flansch-Oberseite — klassische Kerbspannungsstelle beim Einschieben | ✓ |
+| Flansch-Eckenschelfs (4 Bogenkanten bei Z=floor, Körperecke ∩ Flansch-Oberseite) | Chamfer-Fallback | — | Sitzen zwischen der zylindrischen 2-mm-Körperecken­fillet und der ebenen Flansch-Oberseite → OCCT verweigert Fillet UND Chamfer (Tangentenkonflikt). Kosmetisch, ~2×2 mm, nicht lasttragend, MJF druckt sie sauber | Offen (akzeptiert) |
+| Kavitäts-Bodeninnenkanten (4 Kanten bei Z=floor zwischen Bodenplatte und Kavitätswänden) | Fillet | 1.0 mm | Konkave Innenecken — Kerbspannung bei Flexion der Bodenplatte durch Kohlebett-Masse. Ausserdem: Pulver sammelt sich in scharfen 90°-Ecken, Verrundung hilft beim Entpulvern | ✓ |
+| Rabbet-Schulterkanten (konkav/konvex bei Z=size_z−rabbet_depth) | Fillet | 0.3 mm | Kleine Rundung reduziert den abrupten Absatz ohne die Auflageflächen (shelf_w=1.0 mm) nennenswert zu verkleinern (verbleibend ≥0.7 mm Kontakt für Deckel) | ✓ |
+| Snap-Armwurzel (Übergang Arm → Deckelunterseite) | Fillet | 0.5 mm | Klassische Cantilever-Kerbe — ohne Radius wäre das die erste Rissstelle bei Wiederholbelastung. 0.5 mm bringt Spannungskonzentrationsfaktor von ~3 auf <1.5 | ✓ |
+| Deckel-Vertikalecken (4 Kanten entlang Z) | Fillet | 1.0 mm | Handling, konsistent mit Körperecken­fillet (2.0 mm wäre am kleineren Deckel-Footprint zu dominant) | ✓ |
+| Deckel-Oberkante (4 Aussenkanten bei Z=size_z) | Chamfer | 0.5 mm | Sichtseite von oben, verhindert Absplittern und scharfe Kante unter dem Fingerdruck zum Öffnen | ✓ |
+| Deckel-Unterkante (4 Aussenkanten bei Z=size_z−lid_thk) | Chamfer | 0.2 mm | Rabbet-Einführschräge für den Einbau — kleinere Fase, weil der Rabbet-Schelf nur 1.0 mm breit ist. **2/4 Kanten** angewandt (Y-Seiten). Die beiden X-Seiten-Kanten verweigert OCCT konsistent (auch bei 0.3/0.15 mm), weil die 0.5-mm-Armwurzel­fillet nur 0.7 mm vom X-Perimeter entfernt sitzt (Tab-Wurzel bei X≈28.8 vs. Deckelkante X=29.5). Scharf gelassen — MJF druckt sauber | Teilweise (akzeptiert) |
+
+### Per-Kanten-Fallback für OCCT-Grenzfälle
+
+Die Fillet/Chamfer-Operationen im Script nutzen eine `try_fillet` /
+`try_chamfer`-Hilfsfunktion mit zweistufigem Fallback:
+
+1. **Batch-Versuch**: alle selektierten Kanten auf einmal runden/fasen —
+   schnell und konsistent, wenn die Geometrie es erlaubt.
+2. **Per-Kanten-Versuch** bei Fehler: jede Kante einzeln; Fehler einzelner
+   Kanten werden auf STDOUT protokolliert und übersprungen.
+
+Grund: build123d/OCCT wirft eine Exception für den **gesamten** Batch, sobald
+**eine einzige** Kante den gewünschten Radius nicht akzeptiert (typischer­weise
+wegen Tangentenkonflikten mit anderen Radien/Zylinderflächen). Der Fallback
+rettet die übrigen Kanten und gibt Diagnose aus, statt die komplette
+DFM-Verbesserung zu verlieren.
+
+### Konvex vs. konkav — Warum unterschiedliche Werte
+
+- **Konvex/Aussen-Kanten** (Flansch-Unterseite, Körperecken): Chamfer 0.5–0.8
+  mm oder Fillet 2.0 mm. Hauptzweck: Handling, Oberflächenqualität, keine
+  scharfen Kanten gegen Finger oder angrenzende Flächen.
+- **Konkav/Innen-Kanten** (Flansch-Step, Kavitäts-Boden, Armwurzel): Fillet
+  0.3–1.0 mm. Hauptzweck: Kerbspannungsreduktion. Ein konkaver 90°-Winkel
+  hat theoretisch einen unendlichen Spannungskonzentrationsfaktor; selbst
+  kleine Rundungen (~10 % der Wandstärke) bringen ihn auf <2.
+
+### Kein Powder-Trap
+
+Alle Ausfräsungen (Kavität, Rabbet, Hex, Snap-Schlitze) sind durchgehend auf
+die Aussenwelt geöffnet. Die Hex-Bohrungen im Boden und Deckel sind
+deckungsgleich, sodass Pulver während des Entpulverns frei hindurchfallen
+kann. Keine der Fillet- oder Chamfer-Operationen schafft geschlossene Taschen.
+
+### Druckorientierung (Empfehlung fürs Bureau)
+
+- **Snap-Arme parallel zu den Pulverschichten** legen (Biegerichtung
+  parallel zur Schichtebene). MJF ist nahezu isotrop (Z-Richtung ~5–10 %
+  schwächer), aber beim 1-mm-Arm mit zyklischer Biegebelastung zählt jedes
+  Prozent.
+- **Flansch möglichst plan** (Z-Ebene parallel zur Baureise) → gleichmässige
+  Flächenqualität auf den Dichtflächen.
+- Wenn beides nicht gleichzeitig möglich ist: Priorität auf den Snap-Armen.
 
 ## Tiefenauslegung (`size_z` — Luftstromrichtung)
 

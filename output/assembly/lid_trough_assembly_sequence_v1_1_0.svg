@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="420" viewBox="0 0 1140 420">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#111827"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1140" height="420" fill="#ffffff"/>
+  <text x="28" y="36" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#111827">Deckelmontage v1.1.0</text>
+  <text x="28" y="62" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#374151">Passive -X-Hakenleiste zuerst einhängen, dann nach unten rotieren, zuletzt +X-Schnapperseite drücken.</text>
+  <rect x="20" y="80" width="350" height="300" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <rect x="395" y="80" width="350" height="300" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <rect x="770" y="80" width="350" height="300" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="38" y="108" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#111827">1. Passive Seite zuerst einfädeln</text>
+  <polygon points="22.4,315.0 307.6,315.0 307.6,131.0 22.4,131.0" fill="#d1d5db" stroke="#4b5563" stroke-width="2"/>
+  <polygon points="32.5,304.9 297.5,304.9 297.5,142.5 32.5,142.5" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="27.9,142.5 302.1,142.5 302.1,131.0 27.9,131.0" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="28.6,157.2 32.5,157.2 32.5,151.2 28.6,151.2" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="297.5,183.4 307.6,183.4 307.6,179.8 297.5,179.8" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="28.7,124.2 290.9,54.0 287.9,42.9 25.8,113.1" fill="#60a5fa" fill-opacity="0.92" stroke="#1d4ed8" stroke-width="2"/>
+  <polygon points="31.4,123.5 35.4,122.4 39.0,135.8 32.3,137.6 33.9,132.8" fill="#3b82f6" fill-opacity="0.92" stroke="#1d4ed8" stroke-width="2"/>
+  <polygon points="283.3,56.0 287.8,54.8 299.9,100.1 302.6,92.3 302.1,90.5 294.3,79.3 287.8,54.8" fill="#2563eb" fill-opacity="0.92" stroke="#1d4ed8" stroke-width="2"/>
+  <polygon points="28.7,124.2 35.8,122.3 26.8,117.1" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <polygon points="25.8,113.1 32.9,111.2 27.7,120.2" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <line x1="128" y1="140" x2="185" y2="185" stroke="#111827" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="44" y="158" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">-X-Hakenleiste in die Tasche führen.</text>
+  <text x="44" y="176" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Neue Eckfreistiche halten die passiven Ecken frei.</text>
+  <text x="414" y="108" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#111827">2. Um die Hakenlinie nach unten rotieren</text>
+  <polygon points="397.4,315.0 682.6,315.0 682.6,131.0 397.4,131.0" fill="#d1d5db" stroke="#4b5563" stroke-width="2"/>
+  <polygon points="407.5,304.9 672.5,304.9 672.5,142.5 407.5,142.5" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="402.9,142.5 677.1,142.5 677.1,131.0 402.9,131.0" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="403.6,157.2 407.5,157.2 407.5,151.2 403.6,151.2" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="672.5,183.4 682.6,183.4 682.6,179.8 672.5,179.8" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="403.7,138.0 665.9,67.8 662.9,56.7 400.8,126.9" fill="#60a5fa" fill-opacity="0.92" stroke="#1d4ed8" stroke-width="2"/>
+  <polygon points="406.4,137.3 410.4,136.2 414.0,149.6 407.3,151.4 408.9,146.6" fill="#3b82f6" fill-opacity="0.92" stroke="#1d4ed8" stroke-width="2"/>
+  <polygon points="658.3,69.8 662.8,68.6 674.9,113.9 677.6,106.1 677.1,104.3 669.3,93.1 662.8,68.6" fill="#2563eb" fill-opacity="0.92" stroke="#1d4ed8" stroke-width="2"/>
+  <polygon points="403.7,138.0 410.8,136.1 401.8,130.9" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <polygon points="400.8,126.9 407.9,125.0 402.7,134.0" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <path d="M465,153 C520,118 590,118 638,165" fill="none" stroke="#111827" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="418" y="158" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Gefundene Hook-first-Lage: -15°, +X-Kante ~13.9 mm höher.</text>
+  <text x="418" y="176" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Diese Lage ist jetzt ohne harte Kollision erreichbar.</text>
+  <text x="789" y="108" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#111827">3. Schnapperseite nach unten drücken</text>
+  <polygon points="772.4,315.0 1057.6,315.0 1057.6,131.0 772.4,131.0" fill="#d1d5db" stroke="#4b5563" stroke-width="2"/>
+  <polygon points="782.5,304.9 1047.5,304.9 1047.5,142.5 782.5,142.5" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="777.9,142.5 1052.1,142.5 1052.1,131.0 777.9,131.0" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="778.6,157.2 782.5,157.2 782.5,151.2 778.6,151.2" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="1047.5,183.4 1057.6,183.4 1057.6,179.8 1047.5,179.8" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="779.3,142.5 1050.7,142.5 1050.7,131.0 779.3,131.0" fill="#60a5fa" fill-opacity="0.92" stroke="#1d4ed8" stroke-width="2"/>
+  <polygon points="782.1,142.5 786.2,142.5 786.2,156.3 779.3,156.3 782.1,152.2" fill="#3b82f6" fill-opacity="0.92" stroke="#1d4ed8" stroke-width="2"/>
+  <polygon points="1042.9,142.5 1047.5,142.5 1047.5,189.4 1052.1,182.5 1052.1,180.7 1047.5,167.8 1047.5,142.5" fill="#2563eb" fill-opacity="0.92" stroke="#1d4ed8" stroke-width="2"/>
+  <polygon points="779.3,142.5 786.7,142.5 779.3,135.1" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <polygon points="779.3,131.0 786.7,131.0 779.3,138.4" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <line x1="1030" y1="124" x2="1030" y2="170" stroke="#111827" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="792" y="158" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Auf der +X-Seite nach unten drücken.</text>
+  <text x="792" y="176" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Beide Schnapper federn beim Schließen elastisch ~1.0 mm ein.</text>
+  <text x="792" y="194" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Danach rasten sie hörbar in die Slots ein.</text>
+</svg>

@@ -1,12 +1,13 @@
 """
 Activated-carbon filter cassette — build123d, MJF-optimized.
-Target: HP Multi Jet Fusion, PA11 (BASF Ultrasint PA11 or equivalent).
+Target: HP Multi Jet Fusion, PA12 (HP 3D HR PA 12 enabled by Evonik or
+equivalent).
 
 Design intent
 -------------
 Vertical-airflow cassette in its own frame (Z up while filling):
     Floor (Z=0): hex-perforated, fused to the trough body.
-    Lid   (Z=size_z): hex-perforated, removable, snap-fits from above.
+    Lid   (Z=size_z): hex-perforated, removable, hook-and-snap from above.
     Carbon bed sits between two fleece layers inside the cavity.
 
 Filling (cassette upright, lid up):
@@ -35,10 +36,16 @@ frame at the top and bottom while passing cleanly through in X. The cassette
 protrudes `floor` mm (= 2.2 mm) from the opening — enough for finger access,
 well within the user-accepted 5 mm limit.
 
-Snap-fit: two cantilever tabs on the lid engage two through-slots in the
-X-walls of the cassette body (the walls that press into the shaft foam).
-Y-walls (against hard shaft top/bottom) stay completely flush — Moosgummi
-strips on top and bottom of the cassette body provide the axial seal.
+Lid retention: one simple hook rail on one X-side of the lid engages a shallow
+receiving pocket in the opposite trough wall; two cantilever tabs on the
+other X-side engage through-slots in the matching X-wall. The tabs have a
+release ramp, so the lid can be lifted open from a single center notch without
+separately pinching both snaps. The passive side is a modest form-fit, not a
+deep hidden mechanism: enough to define the opening side, simple enough for
+MJF and easy inspection.
+Y-walls (against hard shaft top/bottom) stay completely
+flush —
+Moosgummi strips on top and bottom of the cassette body provide the axial seal.
 
 Viewer:
     pip install build123d ocp-vscode
@@ -80,7 +87,7 @@ set_port(3939)
 # ---------------------------------------------------------------------------
 # Version (engraved onto the +Y flange overhang, apartment-facing side)
 # ---------------------------------------------------------------------------
-VERSION = "1.0.2"
+VERSION = "1.1.0"
 version_font = 5.0       # mm — fits the 10 mm Y-overhang comfortably
 version_depth = 0.6      # mm — recessed engraving; MJF prints this crisp
                          # without weakening the 2.2 mm flange floor
@@ -119,17 +126,51 @@ hex_web = 1.2
 hex_margin_x = 4.0
 hex_margin_y = 4.0
 
-# Snap: cantilever tab on lid + through-slot in trough X-wall.
-# hook_protr = 0.50 mm: at MJF minimum positive-feature size (0.5 mm). A
-# 0.45 mm lip would come out rounded/unscharf; 0.50 mm still prints crisp
-# while keeping max cantilever strain ~3.33 % (PA11 yield ~5 %).
+# Lid retention:
+#   * one simple hook rail on the -X side (engages a shallow side pocket)
+#   * two snap tabs on the +X side (engage through-slots in the +X wall)
+# This revision is tuned for PA12 MJF and for geometric simplicity:
+#   * passive side = one simple hook rail with a short sloped nose
+#   * active side = one long cantilever with a simple asymmetric snap nose
+# The passive side only needs to guide and hold the first opening moment;
+# the active side supplies the real retention and the self-release behavior.
+retainer_y_offset = 18.0
+hook_rail_width = 34.0
+hook_rail_drop = 3.0
+hook_rail_depth = 1.5
+hook_rail_capture = 0.6
+hook_rail_nose_height = 0.9
+hook_slot_w = hook_rail_width + 0.6
+hook_slot_h = hook_rail_nose_height + 0.4
+hook_slot_depth = hook_rail_capture + 0.25
+
 hook_width = 6.0
 hook_arm = 1.0
-hook_length = 6.0
-hook_protr = 0.50
-hook_engage = 0.8
-hook_lead = 1.0
+hook_length = 10.2
+hook_protr = 1.0
+hook_lead = 1.5
+hook_hold = 0.4
+hook_release = 2.8
 hook_root_fil = 0.5
+
+# Opening aid on the snap side (+X): a shallow body notch exposes a small lid
+# lip so the user can lift the lid with one finger. The lip stays within the
+# cassette body envelope, so shaft insertion remains unaffected.
+grip_lip_width = 16.0
+grip_lip_extend = 1.2
+grip_lip_cham = 0.4
+grip_notch_width = 18.0
+grip_notch_height = 5.0
+grip_notch_plane_offset = 1.0
+grip_notch_min_wall = 1.0
+grip_notch_cut = wall + grip_notch_plane_offset - grip_notch_min_wall
+
+# Assembly relief on the passive (-X) side: small plan-view corner cuts at the
+# two passive corners. They are far away from the centered hook rail and keep
+# the rabbet contact almost entirely intact, but remove exactly the corners
+# that otherwise hit the trough during hook-first tilted insertion.
+passive_corner_relief_x = 1.6
+passive_corner_relief_y = 8.0
 
 # DFM (Design-for-Manufacturability) radii applied after the main solid
 # operations. See README "MJF-Optimierungen" for reasoning per edge.
@@ -152,7 +193,8 @@ flange_bot_cham = 0.8    # chamfer around the flange bottom perimeter (grip face
 rabbet_fil = 0.3         # fillet on rabbet shelf edges (inner + outer step)
 
 slot_w = hook_width + 0.6
-slot_h = hook_engage + 0.4
+slot_h = hook_hold + 0.4
+retainer_y_offsets = (-retainer_y_offset, retainer_y_offset)
 
 # No finger recess: the 5 mm Y-flange overhangs (top and bottom) already
 # give a comfortable thumb/index grip for extracting the cassette. Any
@@ -179,7 +221,8 @@ flange_y = size_y + 2 * flange_extra_y      # Y overshoot catches on frame
 
 arm_top_z = size_z - lid_thk               # lid underside in cassette frame
 arm_tip_z = arm_top_z - hook_length
-catch_center_z = arm_tip_z + hook_lead + hook_engage / 2
+catch_center_z = arm_tip_z + hook_lead + hook_hold / 2
+hook_slot_center_z = arm_top_z - hook_rail_drop + hook_rail_nose_height / 2
 slot_z_min = catch_center_z - slot_h / 2
 slot_z_max = catch_center_z + slot_h / 2
 
@@ -274,7 +317,7 @@ def try_chamfer(edges, length, label):
 
 
 # ---------------------------------------------------------------------------
-# Trough: body + floor flange, hex-perforated floor, X-wall snap slots.
+# Trough: body + floor flange, hex-perforated floor, hook pocket, snap wall.
 # ---------------------------------------------------------------------------
 with BuildPart() as trough_b:
     # Main body (centered in X and Y, rises from Z=0 to size_z)
@@ -420,24 +463,61 @@ with BuildPart() as trough_b:
                 RegularPolygon(radius=r_hex, side_count=6, rotation=90)
     extrude(amount=floor + 2.0, mode=Mode.SUBTRACT)
 
-    # Two through-slots in X outer walls for snap engagement
+    # Shallow hook pocket in the -X cavity wall. This is the intended middle
+    # ground: a real passive hold-down, but just one simple rectangular pocket
+    # under the rabbet shelf rather than a deep or topologically fancy latch.
+    with BuildSketch(Plane.YZ.offset(-cavity_x / 2)) as _:
+        with Locations((0.0, hook_slot_center_z)):
+            Rectangle(hook_slot_w, hook_slot_h)
+    extrude(amount=-hook_slot_depth, mode=Mode.SUBTRACT)
+
+    # Release notch on the +X snap side: removes only the local outer-wall
+    # material above the rabbet so the lid lip is reachable by fingertip.
+    with BuildSketch(Plane.YZ.offset(size_x / 2 + grip_notch_plane_offset)) as _:
+        with Locations((0.0, size_z - grip_notch_height / 2)):
+            Rectangle(grip_notch_width, grip_notch_height)
+    extrude(amount=-grip_notch_cut, mode=Mode.SUBTRACT)
+
+    # Two through-slots in the +X outer wall for snap engagement.
     # Plane.YZ: sketch-X maps to world-Y, sketch-Y maps to world-Z.
     with BuildSketch(Plane.YZ.offset(size_x / 2 + 1.0)) as _:
-        with Locations((0.0, catch_center_z)):
-            Rectangle(slot_w, slot_h)
+        for y in retainer_y_offsets:
+            with Locations((y, catch_center_z)):
+                Rectangle(slot_w, slot_h)
     extrude(amount=-(wall + 2.0), mode=Mode.SUBTRACT)
-    with BuildSketch(Plane.YZ.offset(-size_x / 2 - 1.0)) as _:
-        with Locations((0.0, catch_center_z)):
-            Rectangle(slot_w, slot_h)
-    extrude(amount=wall + 2.0, mode=Mode.SUBTRACT)
 
 assert trough_b.part is not None
 trough = trough_b.part
 
 
 # ---------------------------------------------------------------------------
-# Lid: hex-perforated slab + two cantilever tabs on X-edges
+# Lid: hex-perforated slab + -X hook rail + +X snap tabs + pull lip
 # ---------------------------------------------------------------------------
+def make_hook_rail_proto():
+    """Simple passive hook rail in local frame.
+
+    Local x = inward from the lid edge, local z = downward into the trough.
+    The upper stem is intentionally inset, while the lower nose reaches the lid
+    edge with one simple sloped hook. This gives a modest passive capture
+    without the visually busier stepped foot used before.
+    """
+    with BuildPart() as a:
+        with BuildSketch(Plane.XZ) as _:
+            with BuildLine() as _bl:
+                Polyline(
+                    (hook_rail_capture, 0.0),
+                    (hook_rail_depth, 0.0),
+                    (hook_rail_depth, -hook_rail_drop),
+                    (0.0, -hook_rail_drop),
+                    (hook_rail_capture, -hook_rail_drop + hook_rail_nose_height),
+                    close=True,
+                )
+            make_face()
+        extrude(amount=hook_rail_width / 2, both=True)
+    assert a.part is not None
+    return a.part
+
+
 def make_tab_proto():
     """
     Tab in local frame:
@@ -445,7 +525,9 @@ def make_tab_proto():
       attach plane at local x = 0 (arm outer face)
       arm material at x ∈ [-hook_arm, 0]
       arm spans z ∈ [-hook_length, 0], attach at z = 0
-      lip protrudes +X from arm outer face; trapezoidal profile in XZ.
+      lip protrudes +X from arm outer face; a simple asymmetric nose with
+      lower closing ramp, very short hold flat, and a long release ramp for
+      one-finger lift-off.
     """
     with BuildPart() as h:
         Box(
@@ -457,8 +539,8 @@ def make_tab_proto():
                 Polyline(
                     (0.0, -hook_length),
                     (hook_protr, -hook_length + hook_lead),
-                    (hook_protr, -hook_length + hook_lead + hook_engage),
-                    (0.0, -hook_length + hook_lead + hook_engage),
+                    (hook_protr, -hook_length + hook_lead + hook_hold),
+                    (0.0, -hook_length + hook_lead + hook_hold + hook_release),
                     close=True,
                 )
             make_face()
@@ -473,6 +555,34 @@ with BuildPart() as lid_b:
         Rectangle(lid_x, lid_y)
     extrude(amount=lid_thk)
 
+    # Small pull lip on the +X snap side. It sits inside the body envelope
+    # and is only exposed where the trough's release notch clears the wall.
+    with BuildSketch(Plane.XY.offset(size_z - lid_thk)) as _:
+        with Locations((lid_x / 2 + grip_lip_extend / 2, 0.0)):
+            Rectangle(grip_lip_extend, grip_lip_width)
+    extrude(amount=lid_thk)
+
+    # Small plan-view corner reliefs on the passive hook side. These are not
+    # part of the sealing/retention path; they only free the two -X corners so
+    # the lid can be offered into the trough at a slight tilt without the
+    # passive corner digging into the rabbet/top-wall geometry first.
+    with BuildSketch(Plane.XY.offset(size_z - lid_thk)) as _:
+        with BuildLine() as _bl:
+            Polyline(
+                (-lid_x / 2, -lid_y / 2),
+                (-lid_x / 2 + passive_corner_relief_x, -lid_y / 2),
+                (-lid_x / 2, -lid_y / 2 + passive_corner_relief_y),
+                close=True,
+            )
+            Polyline(
+                (-lid_x / 2, lid_y / 2),
+                (-lid_x / 2 + passive_corner_relief_x, lid_y / 2),
+                (-lid_x / 2, lid_y / 2 - passive_corner_relief_y),
+                close=True,
+            )
+        make_face()
+    extrude(amount=lid_thk, mode=Mode.SUBTRACT)
+
     # Hex perforation on the lid — same pattern as floor for straight flow
     with BuildSketch(Plane.XY.offset(size_z - lid_thk - 1.0)) as _:
         for cx, cy in hex_pattern:
@@ -480,15 +590,16 @@ with BuildPart() as lid_b:
                 RegularPolygon(radius=r_hex, side_count=6, rotation=90)
     extrude(amount=lid_thk + 2.0, mode=Mode.SUBTRACT)
 
-    # Two tabs on X-edges. Arm outer face aligned with the cavity wall
-    # inner face; lip protrudes outward into the wall slot.
+    # Passive hook rail on -X plus two snap tabs on +X. The +X arm outer face
+    # aligns with the cavity wall inner face; the lip protrudes outward into
+    # the +X wall slot.
+    hook_rail = make_hook_rail_proto()
     tab = make_tab_proto()
-    arm_x_right = cavity_x / 2
-    arm_x_left = -cavity_x / 2
+    add(hook_rail.moved(Location((-lid_x / 2, 0.0, arm_top_z), (0, 0, 0))))
 
     tab_locs = [
-        Location((arm_x_right, 0.0, arm_top_z), (0, 0, 0)),
-        Location((arm_x_left, 0.0, arm_top_z), (0, 0, 180)),
+        Location((cavity_x / 2, y, arm_top_z), (0, 0, 0))
+        for y in retainer_y_offsets
     ]
     for loc in tab_locs:
         add(tab.moved(loc))
@@ -498,9 +609,8 @@ with BuildPart() as lid_b:
     # to fillet the lid perimeter edges (no adjacent material on one side).
     arm_bbs = [
         (cavity_x / 2 - hook_arm, cavity_x / 2,
-         -hook_width / 2, hook_width / 2),
-        (-cavity_x / 2, -cavity_x / 2 + hook_arm,
-         -hook_width / 2, hook_width / 2),
+         y - hook_width / 2, y + hook_width / 2)
+        for y in retainer_y_offsets
     ]
     tol = 0.05
     root_edges = []
@@ -554,6 +664,24 @@ with BuildPart() as lid_b:
     try_chamfer(lid_top_perim, lid_top_cham, "lid top perim")
     try_chamfer(lid_bot_perim, lid_bot_cham, "lid bot perim")
 
+    # Dedicated chamfer on the pull lip so the fingertip contact edge isn't
+    # a sharp 90° ridge. Kept smaller than the general lid perimeter chamfer
+    # because the lip only extends 1.2 mm in X.
+    grip_lip_top = []
+    grip_lip_bot = []
+    for e in lid_b.edges():
+        c = e.center()
+        on_grip_face = (abs(c.X - (lid_x / 2 + grip_lip_extend)) < 0.1
+                        and abs(c.Y) <= grip_lip_width / 2 + 0.1)
+        if not on_grip_face:
+            continue
+        if abs(c.Z - lid_top_z) < 0.01:
+            grip_lip_top.append(e)
+        elif abs(c.Z - lid_bot_z) < 0.01:
+            grip_lip_bot.append(e)
+    try_chamfer(grip_lip_top, grip_lip_cham, "grip lip top")
+    try_chamfer(grip_lip_bot, grip_lip_cham, "grip lip bot")
+
     # --- DFM: lid vertical corner fillets (1.0 mm) -------------------------
     # Four vertical edges of the lid slab perimeter. MJF prints sharp 90°
     # edges cleanly; these fillets are purely for handling (no chipping, no
@@ -584,6 +712,33 @@ if residual_wall < 1.0:
 
 deflection = hook_protr + fit_clear
 strain = 3.0 * hook_arm * deflection / (2.0 * hook_length ** 2)
+# HP 3D HR PA12 enabled by Evonik datasheet ranges:
+#   * JF 5200: tensile modulus ≈ 1650…2200 MPa
+#   * JF 5600: tensile modulus ≈ 2000…2300 MPa, elongation at yield ≈ 9…11 %
+# Use a conservative PA12 nominal value for the center estimate and print the
+# broader force band as an informational range.
+snap_modulus = 2150.0
+snap_modulus_lo = 1650.0
+snap_modulus_hi = 2200.0
+pa12_yield_lo = 0.09
+pa12_yield_hi = 0.11
+arm_inertia = hook_width * hook_arm ** 3 / 12.0
+snap_spring_k = 3.0 * snap_modulus * arm_inertia / (hook_length ** 3)
+snap_spring_k_lo = 3.0 * snap_modulus_lo * arm_inertia / (hook_length ** 3)
+snap_spring_k_hi = 3.0 * snap_modulus_hi * arm_inertia / (hook_length ** 3)
+snap_force = snap_spring_k * deflection
+snap_force_lo = snap_spring_k_lo * deflection
+snap_force_hi = snap_spring_k_hi * deflection
+release_run_ratio = hook_protr / hook_release
+release_mu = 0.20
+lift_factor = ((release_run_ratio + release_mu)
+               / (1.0 - release_mu * release_run_ratio))
+lift_force = snap_spring_k * hook_protr * lift_factor
+lift_force_lo = snap_spring_k_lo * hook_protr * lift_factor
+lift_force_hi = snap_spring_k_hi * hook_protr * lift_factor
+hook_capture = hook_rail_capture
+allowable_strain_lo = pa12_yield_lo / 3.0
+allowable_strain_hi = pa12_yield_hi / 3.0
 
 print(f"Cassette body:            {size_x}×{size_y}×{size_z} mm")
 print(f"Floor flange footprint:   {flange_x}×{flange_y}×{floor} mm")
@@ -593,7 +748,16 @@ print(f"Wall thickness:           {wall:.2f} mm")
 print(f"Residual wall at rabbet:  {residual_wall:.2f} mm")
 print(f"Lid clearance per side:   {fit_clear:.2f} mm")
 print(f"Hex holes (per face):     {len(hex_pattern)}")
-print(f"Snap arm max strain:      {strain*100:.2f} %  (PA11 yield ~5 %)")
+print(f"Snap arm max strain:      {strain*100:.2f} %")
+print(f"PA12 strain proxy target: <{allowable_strain_lo*100:.2f} … "
+      f"{allowable_strain_hi*100:.2f} % "
+      f"(= 1/3 of 9 … 11 % yield)")
+print(f"Hook capture at passive side: ~{hook_capture:.2f} mm")
+print(f"Snap force per tab:       ~{snap_force:.2f} N lateral "
+      f"({snap_force_lo:.2f} … {snap_force_hi:.2f} N over PA12 modulus range)")
+print(f"Lift-open force total:    ~{2*lift_force:.2f} N "
+      f"({2*lift_force_lo:.2f} … {2*lift_force_hi:.2f} N, "
+      f"2 tabs incl. mu={release_mu:.2f})")
 print(f"Trough volume:            {trough.volume / 1000:.2f} cm³")
 print(f"Lid volume:               {lid.volume / 1000:.2f} cm³")
 
@@ -611,11 +775,11 @@ stl_dir.mkdir(parents=True, exist_ok=True)
 export_step(trough, str(step_dir / "trough.step"))
 export_step(lid, str(step_dir / "lid.step"))
 
-# STL export: angular tolerance tightened from the 0.1 rad (≈5.7°) default
-# to 0.05 rad (≈2.9°) so that adjacent curved faces tessellate consistently
-# along their shared edges — reduces OCCT t-vertex seam artifacts.
+# STL export: use a 1° angular tolerance per HP's general MJF tessellation
+# recommendation and a fine linear tolerance so curved faces share vertices
+# more consistently. STEP remains the authoritative upload format.
 _stl_linear_tol = 1e-3
-_stl_angular_tol = 0.05
+_stl_angular_tol = math.radians(1.0)
 export_stl(
     trough,
     str(stl_dir / "trough.stl"),
@@ -655,7 +819,14 @@ def _heal_stl(path: Path) -> None:
          a handful of residual intersections, and the STEP export remains
          the authoritative clean upload path.
     """
-    import pymeshfix
+    try:
+        import pymeshfix
+    except ModuleNotFoundError:
+        print(
+            f"  STL heal {path.name}: skipped "
+            f"(optional dependency 'pymeshfix' not installed)"
+        )
+        return
 
     mesh = pymeshfix.PyTMesh()
     mesh.set_quiet(True)

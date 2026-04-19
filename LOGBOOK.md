@@ -2,6 +2,174 @@
 
 Chronologisches Protokoll der Design- und Toolchain-Entscheidungen.
 
+## 2026-04-19
+
+### Vollbaugruppen-Kontakt für Deckel gegen Trog
+
+Zur lokalen Schnapper-FEM kam ein separater Baugruppen-Checker hinzu. Der
+erste Lauf zeigte noch eine Restkollision an der passiven `-X/-Y`-Deckelecke.
+Daraufhin wurden an den beiden passiven Deckelecken kleine Freistiche in
+der Draufsicht ergänzt; der Checker wurde danach erneut ausgeführt.
+
+Aktueller Stand:
+
+- neuer Solver `fem/lid_trough_assembly.py`
+- voller Deckel gegen vollen Trog
+- starre Kinematik, aber mit echter STL-Geometrie beider Teile
+- Signed-Distance gegen das Trogmaterial entlang einer Hook-first-
+  Bewegungsfamilie um die passive Hakenlinie
+- ergänzende Montagezeichnungen über `fem/assembly_sequence_svg.py`
+
+Ergebnis für `v1.1.0`:
+
+- beste gefundene Kipplage im Suchraum: `-15°`, `dx = +0.40 mm`,
+  `dz = +1.20 mm`
+- eingehakte Kipplage kollisionsfrei
+- vertikale Einfädelbahn in dieser Kipplage kollisionsfrei
+- Schließbahn in die Endlage ohne harte Restkollision; nur die aktiven
+  Schnapper interferieren noch wie vorgesehen elastisch mit `~0.98 mm`
+- die passive Seite ist durch die Eckfreistiche jetzt keine Störkante mehr
+
+Schlussfolgerung:
+
+- Die aktuelle mittige Hakenleiste funktioniert jetzt auch als nutzbare
+  Hook-first-Kippachse für die Baugruppe.
+- Die passive Seite braucht keine weitere Grundsatz-Änderung mehr; die
+  lokale Entlastung an den beiden `-X`-Ecken reicht im geprüften Suchraum.
+- Offene Restfrage ist nicht mehr die Kinematik, sondern nur noch die
+  physische Plausibilisierung am Druckmuster.
+
+### Dokumentation auf 1.1.0-Stand synchronisiert
+
+README, TODO und die Hilfsscripte wurden auf denselben Stand wie Geometrie und
+Analysen gezogen:
+
+- README führt jetzt den aktuellen Hook-first-Befund mit passiven
+  Eckfreistichen als gültigen Stand und behandelt den früheren negativen
+  Checker-Lauf nur noch als überholten Zwischenstand.
+- Die erzeugten SVG-Montagezeichnungen und ihre Dateinamen sind dokumentiert.
+- Beispielaufrufe für `fem/snap_fit_fem.py` und
+  `fem/lid_trough_assembly.py` stellen klar, dass die JSON-/VTK-Zielpfade bei
+  Bedarf automatisch angelegt werden.
+- TODO verweist bei der Montageprüfung nur noch auf physische
+  Druckmuster-Validierung, nicht mehr auf eine prinzipiell blockierte
+  Kippkinematik.
+
+### Lokale FE-Baseline für den aktiven Schnapper
+
+Zusätzlich zur bisherigen Balkenabschätzung wurde eine reproduzierbare
+3D-FE-Analyse für den aktiven Schnapper angelegt:
+
+- neuer Solver in `fem/snap_fit_fem.py`
+- Gmsh für das lokale Tetra-Netz
+- scikit-fem für lineare Elastizität
+- Lastangriff direkt auf der realen Rastfläche statt am freien Armende
+
+Erste Ergebnisse mit `mesh_size = 0.25 mm` und nominal `E = 2150 MPa`:
+
+- laterale Federsteifigkeit pro Schnapper: `~7.3 N/mm`
+- laterale Auslenkkraft für `1.30 mm`: `~9.5 N` pro Schnapper
+- abgeleitete Gesamt-Hebekraft: `~6.7 … 9.0 N`
+- maximale Hauptdehnung: `~3.2 %`
+
+Wichtigste Erkenntnis:
+
+- Die FE liegt merklich über der einfachen Cantilever-Formel, weil die
+  Last realistisch auf der kurzen Haltefläche bei `z ≈ -8.5 mm` und nicht
+  am absoluten Armende ansetzt.
+- Die Geometrie bleibt damit für werkzeugloses Öffnen weiterhin plausibel.
+- Die Dehnungsreserve ist kleiner als die reine Balkenformel vermuten liess,
+  bleibt aber noch im HP-`1/3`-Proxyband für PA12.
+
+### Deckel-Redesign auf einfache Hakenleiste + selbstlösende Schnapper, Release v1.1.0
+
+Ausgangspunkt war die Sorge, dass zwei symmetrische Rastnasen zwar halten,
+aber beim Öffnen unnötig fummelig sind. Gleichzeitig waren die beiden Extreme
+unbefriedigend:
+
+- reine Führungsleiste: zu wenig passive Haltefunktion
+- tiefes Haken-/Taschensystem: unnötig komplex für MJF und diese Anwendung
+
+Das Design wurde deshalb auf einen Mittelweg umgestellt:
+
+- **1 passive Hakenleiste** auf der -X-Seite des Deckels
+- **1 flache Haken-Tasche** in der -X-Trogwand
+- **2 Cantilever-Schnapper** auf der +X-Seite
+- **1 kleine Zuglippe** am Deckel auf der Schnapper-Seite
+- **1 Freistellung** in der Trogwand, damit die Lippe mit einem Finger
+  erreichbar ist
+
+**Warum diese Aufteilung**:
+
+- Klare passive Halte-Seite statt bloßer Führung
+- Einfacher als ein tiefes verdecktes Hakensystem
+- Montage wird geführt: Haken erst in die Tasche einsetzen, dann
+  Schnapper-Seite herunterdrücken
+- Öffnen wird kontrolliert: an der Lippe anheben, die Schnapper cammen über
+  ihre obere Rampe selbsttätig frei, Deckel klappt an der Haken-Seite hoch
+- Toleranzfreundlicher als 4 aktive Schnapper, die alle gleichzeitig sauber
+  einrasten müssten
+
+### Kraftabschätzung für das Öffnen
+
+Die Schnapper wurden mit dem klassischen Cantilever-Modell abgeschätzt
+(`F = 3 E I δ / L³`, `I = b t³ / 12`) für MJF-PA11 mit
+`E ≈ 1.6 … 1.8 GPa`.
+
+Vergleich:
+
+| Geometrie | Auslenkung `δ` | Armlänge `L` | laterale Kraft pro Schnapper | Dehnung |
+|---|---|---|---|---|
+| bisher `v1.0.2` | 0.80 mm | 6.0 mm | ~8.9 … 10.0 N | ~3.33 % |
+| Zwischenstand `v1.1.0` | 0.80 mm | 7.0 mm | ~5.6 … 6.3 N | ~2.45 % |
+
+Zusätzlich wurde die Geometrie der Rastlippe geändert:
+
+- kurze **Haltelänge** `0.4 mm`
+- obere **Auslöserampe** `1.4 mm`
+- mittige **Zuglippe** `1.2 mm` tief
+
+Mit einer groben Reibannahme `μ ≈ 0.2` ergibt das für die neue
+Hebebewegung eine geschätzte Gesamt-Fingerkraft von **~4.5 N** für beide
+Schnapper zusammen. Die laterale Federkraft bleibt höher, aber sie muss nicht
+mehr direkt mit zwei Fingern an den Armen eingeleitet werden.
+
+Die passive Haken-Seite hat bei der gewählten Geometrie etwa
+`hook_rail_foot_depth - hook_rail_leg_depth ≈ 0.5 mm` wirksame Überdeckung.
+Damit ist die Gegenseite nicht nur "geführt", sondern nimmt beim Öffnen den
+Gegenmomentpfad formschlüssig auf, ohne geometrisch auszuufern.
+
+**Schlussfolgerung**:
+
+- Werkzeugloses Öffnen ist mit `v1.1.0` jetzt auch **einhändig** realistisch
+- zerstörungsfreier Betrieb ist bei den erwarteten wenigen Zyklen klar
+  plausibel
+- die Reserve zur groben PA11-Streckgrenze (~5 %) ist jetzt deutlich besser
+
+Die Schnapperlänge wurde deshalb bewusst von `6.0` auf `7.0 mm` erhöht;
+`hook_arm = 1.0 mm` bleibt unverändert, damit das Feature MJF-konservativ
+bleibt. Die passive Gegenseite wurde als **einfache** Haken-/Taschen-Paarung
+ausgeführt, weil das der beste Kompromiss ist: mehr Klarheit und Haltefunktion
+als eine Führungsleiste, aber deutlich weniger Komplexität als ein tiefes
+verdecktes Hakensystem. Die Öffnungsbewegung ist damit kinematisch eindeutig:
+
+1. Finger zieht an der +X-Zuglippe
+2. +X-Schnapper cammen frei
+3. -X-Haken bleibt eingehakt und bildet die Drehachse
+4. Deckel klappt auf
+5. Zum vollständigen Abnehmen wird der geöffnete Deckel leicht zur
+   Schnapper-Seite verschoben und dann nach oben entnommen
+
+### `_heal_stl()` toleriert fehlendes `pymeshfix`
+
+Die bisherige Toolchain brach lokal ab, wenn `pymeshfix` nicht installiert
+war. Das war unnötig streng, weil STEP/STL zu diesem Zeitpunkt bereits
+exportiert waren. `_heal_stl()` behandelt `pymeshfix` jetzt als **optionale**
+Dependency:
+
+- mit `pymeshfix`: unverändertes Heal-Verhalten
+- ohne `pymeshfix`: Hinweis auf STDOUT, Export läuft trotzdem vollständig durch
+
 ## 2026-04-17
 
 ### MJF-Optimierung und FreeCAD-Abkehr

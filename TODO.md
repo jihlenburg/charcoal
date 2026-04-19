@@ -5,8 +5,8 @@
 - [ ] `trough.stl` (geheilt) erneut beim Bureau hochladen und DFM-Check
       verifizieren (erwartet: 0 non-manifold, 0 Randkanten,
       0 Selbstdurchdringungen)
-- [ ] Viewer-Recheck nach Fix: sind **beide** Slots jetzt komplett durch die
-      X-Wände geschnitten und die Rastnasen fluchten mit ihren Slots?
+- [ ] Viewer-/Druckmuster-Recheck `v1.1.0`: fluchten die zwei +X-Slots mit den
+      Schnappern, und sitzt die einfache -X-Hakenleiste sauber in ihrer Tasche?
 - [ ] Fingergriff: reicht der 10 mm Y-Flanschüberstand, um die Kassette
       gegen den Sog der Absaugung zu ziehen? Prüfung nach Druckmuster.
 - [ ] Armwurzel-Fillet visuell prüfen — Kanten-Selektor ist bbox-gefiltert,
@@ -16,12 +16,22 @@
       erwarteten 2.2 mm aus dem Schacht?
 - [ ] Moosgummistreifen auf Y-Flächen des Körpers auswählen (Materialstärke
       auf Spalt ~3.5 mm zwischen Körper und harter Schachtwand abstimmen)
-- [ ] Rastnasen hörbar einrastend? Beide Lippen gleichzeitig zum Öffnen
-      eindrückbar? Prüfen, ob die 0.50-mm-Lippe MJF-sauber gedruckt wurde
+- [ ] Öffnungsbedienung am Druckmuster prüfen: reicht die mittige
+      Ein-Finger-Hebebewegung an der Zuglippe? Lösen beide Schnapper sauber
+      über die Auslöserampe? 0.50-mm-Lippen und 1.2-mm-Zuglippe MJF-sauber
+      gedruckt?
+- [ ] Passive Seite am Druckmuster prüfen: bleibt der -X-Haken beim Öffnen
+      definiert eingehakt und klappt der Deckel tatsächlich um diese Seite
+      auf? Reicht die kleine Verschiebebewegung zum kompletten Aushängen?
+- [ ] Hook-first-Montage am Druckmuster plausibilisieren: greifen die neuen
+      passiven Eckfreistiche praktisch wie im Baugruppen-Checker, und lässt
+      sich der Deckel tatsächlich erst einhängen und dann herunterkippen?
 - [ ] Maßprüfung nach Druck: Deckel-Spiel 0.30 mm in Ordnung? Hex-Lochweite
       im Soll (MJF-Verzug)?
 - [ ] Druckorientierung mit Bureau abstimmen (Snap-Arme parallel zu
       Schichten, Flansch möglichst plan)
+- [ ] FE-Abschätzung am Druckmuster plausibilisieren: subjektiv ~7–9 N
+      Gesamt-Hebekraft? Wiederholtes Öffnen ohne Whitening/Rissbildung?
 - [ ] Lüfter-Specs (Modell, Volumenstrom, Statikdruck) erfassen, um
       `size_z` ggf. nachzujustieren
 - [ ] DFM-Check am Druckmuster: wirken die gefilleteten Kanten (Flansch-Step
@@ -29,19 +39,58 @@
       gewünscht? Sind die 4 offenen Flansch-Eckenschelfs (OCCT-Limitation)
       wirklich nur kosmetisch?
 - [ ] Deckel-DFM am Druckmuster: Eckenfillet 1.0 mm, Oberkanten-Chamfer 0.5 mm,
-      Unterkanten-Chamfer 0.2 mm (2/4 Y-Seiten) haptisch ok? Stören die 2
-      scharfen X-Seiten-Unterkanten (OCCT-Limitation) beim Einsetzen?
-- [ ] Optional v1.0.2: Flansch-Eckenschelfs durch Redesign (Flansch mit
+      Unterkanten-Chamfer 0.2 mm / Zuglippen-Chamfer 0.4 mm haptisch ok?
+      Stören die lokal scharfen Restkanten (OCCT-Limitation) beim Einsetzen?
+- [ ] Optional v1.1.0: Flansch-Eckenschelfs durch Redesign (Flansch mit
       eigenen Ecken-Fillets) auflösen — nur falls das Druckmuster tatsächlich
       stört
 - [ ] Lesbarkeit der Versionsgravur am Druckmuster prüfen — Font-Size 5 mm,
-      Tiefe 0.6 mm ausreichend bei MJF/PA11? Ggf. Tiefe auf 0.8 mm erhöhen
+      Tiefe 0.6 mm ausreichend bei MJF/PA12? Ggf. Tiefe auf 0.8 mm erhöhen
 
 ## In Arbeit
 
 _(leer)_
 
 ## Erledigt
+
+- [x] Release `v1.1.0` vorbereitet (2026-04-19):
+      - asymmetrische Deckelverriegelung `1 einfache Hakenleiste + 2 Schnapper`
+      - selbstlösende Schnapper mit oberer Auslöserampe
+      - Zuglippe + Freistellung auf der Schnapper-Seite
+      - Schnapperlänge 6.0 → 7.0 mm für geringere Öffnungskraft
+      - Kraftabschätzung dokumentiert (~5.6–6.3 N lateral pro Schnapper,
+        ~4.5 N Hebekraft gesamt)
+      - `_heal_stl()` toleriert fehlendes `pymeshfix`
+
+- [x] Lokale FEM für aktiven Schnapper ergänzt (2026-04-19):
+      - neuer Solver `fem/snap_fit_fem.py`
+      - Gmsh + scikit-fem Workflow
+      - nominell ~9.5 N laterale Auslenkkraft pro Schnapper
+      - nominell ~8.8 N Gesamt-Hebekraft, FE-Band ~6.7–9.0 N
+      - maximale Hauptdehnung ~3.2 %
+
+- [x] Vollbaugruppen-Kontaktmodell ergänzt (2026-04-19):
+      - neuer Solver `fem/lid_trough_assembly.py`
+      - voller Deckel gegen vollen Trog als starre STL-Baugruppe
+      - Hook-first-Kinematik um passive Hakenlinie geprüft
+      - passive `-X`-Eckfreistiche ergänzt und erneut geprüft
+      - Hook-first-Kipp-/Einhakebahn im Suchraum jetzt geometrisch plausibel
+      - harte Restkollision eliminiert; verbleibende Interferenz nur an den
+        aktiven Schnappern als beabsichtigte elastische Einfederung
+
+- [x] SVG-Montagezeichnungen ergänzt (2026-04-19):
+      - neuer Generator `fem/assembly_sequence_svg.py`
+      - Sequenzblatt für Einhängen → Herunterkippen → Einrasten
+      - Detailblatt zur elastischen Schnapper-Einfederung
+
+- [x] Dokumentation auf aktuellen `v1.1.0`-Stand synchronisiert (2026-04-19):
+      - README beschreibt den aktualisierten Hook-first-Befund mit
+        passiven Eckfreistichen als gültigen Stand
+      - Beispielpfade für FEM-/Assembly-JSON und VTK dokumentiert
+        inklusive Auto-Anlage der Zielverzeichnisse
+      - SVG-Montagezeichnungen und Ausgabepfade dokumentiert
+      - veraltete Kinematik-Blocker aus README/TODO bereinigt und nur noch als
+        Zwischenstand im Logbuch eingeordnet
 
 - [x] FreeCAD-Macro gelöscht, alle Referenzen entfernt (2026-04-17)
 - [x] build123d-Script MJF-optimiert (2026-04-17):

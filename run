@@ -1,0 +1,186 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV="${CHARCOAL_VENV:-"$ROOT/.venv"}"
+VENV_PY="$VENV/bin/python"
+
+usage() {
+    cat <<'EOF'
+Usage: ./run [--with-heal] <command> [args...]
+
+Commands:
+  setup              Create/update .venv and exit
+  cad                Run carbon_filter_build123d.py
+  fem-snap           Run fem/snap_fit_fem.py
+  fem-hook           Run fem/hook_hold_fem.py
+  fem-assembly       Run fem/lid_trough_assembly.py
+  drawings           Run fem/assembly_sequence_svg.py
+  python             Run venv Python with the given args
+  pip                Run venv pip with the given args
+  shell              Open a shell with the venv on PATH
+
+Options:
+  --with-heal        Also install requirements-heal.txt (pymeshfix)
+
+The bootstrap Python is selected automatically from Python 3.9-3.12
+(CAD/OCP wheels are not available for every newest Python release).
+Set PYTHON=/path/to/python to override.
+EOF
+}
+
+is_python_compatible() {
+    "$1" - <<'PY' >/dev/null 2>&1
+import sys
+raise SystemExit(0 if (3, 9) <= sys.version_info[:2] <= (3, 12) else 1)
+PY
+}
+
+python_version() {
+    "$1" - <<'PY'
+import sys
+print(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+PY
+}
+
+select_bootstrap_python() {
+    local candidate
+
+    if [ -n "${PYTHON:-}" ]; then
+        if is_python_compatible "$PYTHON"; then
+            command -v "$PYTHON" 2>/dev/null || printf '%s\n' "$PYTHON"
+            return
+        fi
+        echo "PYTHON=$PYTHON is not compatible; use Python 3.9-3.12." >&2
+        exit 2
+    fi
+
+    for candidate in python3.11 python3.12 python3.10 python3.9 python3; do
+        if command -v "$candidate" >/dev/null 2>&1 && is_python_compatible "$candidate"; then
+            command -v "$candidate"
+            return
+        fi
+    done
+
+    echo "No compatible Python found. Install Python 3.9-3.12, then rerun ./run setup." >&2
+    exit 2
+}
+
+hash_file() {
+    if command -v shasum >/dev/null 2>&1; then
+        shasum -a 256 "$1" | awk '{print $1}'
+    elif command -v sha256sum >/dev/null 2>&1; then
+        sha256sum "$1" | awk '{print $1}'
+    else
+        echo "Neither shasum nor sha256sum is available." >&2
+        exit 2
+    fi
+}
+
+ensure_venv() {
+    if [ -x "$VENV_PY" ] && ! is_python_compatible "$VENV_PY"; then
+        if [ "$VENV" = "$ROOT/.venv" ]; then
+            echo "Existing .venv uses unsupported Python $(python_version "$VENV_PY"); recreating with $(python_version "$BOOTSTRAP_PYTHON")."
+            rm -rf "$VENV"
+        else
+            echo "Configured venv uses unsupported Python $(python_version "$VENV_PY"): $VENV" >&2
+            echo "Use a Python 3.9-3.12 environment or unset CHARCOAL_VENV." >&2
+            exit 2
+        fi
+    fi
+
+    if [ ! -x "$VENV_PY" ]; then
+        echo "Creating .venv with Python $(python_version "$BOOTSTRAP_PYTHON")..."
+        "$BOOTSTRAP_PYTHON" -m venv "$VENV"
+    fi
+}
+
+install_if_changed() {
+    local req="$1"
+    local stamp="$2"
+    local label="$3"
+    local current_hash
+    local installed_hash=""
+
+    current_hash="$(hash_file "$req")"
+    if [ -f "$stamp" ]; then
+        installed_hash="$(cat "$stamp")"
+    fi
+
+    if [ "$current_hash" != "$installed_hash" ]; then
+        echo "Installing $label from ${req#$ROOT/}..."
+        "$VENV_PY" -m pip install --upgrade pip
+        "$VENV_PY" -m pip install -r "$req"
+        printf '%s\n' "$current_hash" > "$stamp"
+    fi
+}
+
+with_heal=0
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --with-heal)
+            with_heal=1
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+if [ "$#" -eq 0 ]; then
+    usage
+    exit 2
+fi
+
+cmd="$1"
+shift
+
+BOOTSTRAP_PYTHON="$(select_bootstrap_python)"
+ensure_venv
+install_if_changed "$ROOT/requirements.txt" "$VENV/.requirements-core.sha256" "core dependencies"
+
+if [ "$with_heal" -eq 1 ]; then
+    install_if_changed "$ROOT/requirements-heal.txt" "$VENV/.requirements-heal.sha256" "optional STL-heal dependencies"
+fi
+
+case "$cmd" in
+    setup)
+        echo "Environment ready: $VENV"
+        ;;
+    cad)
+        exec "$VENV_PY" "$ROOT/carbon_filter_build123d.py" "$@"
+        ;;
+    fem-snap)
+        exec "$VENV_PY" "$ROOT/fem/snap_fit_fem.py" "$@"
+        ;;
+    fem-hook)
+        exec "$VENV_PY" "$ROOT/fem/hook_hold_fem.py" "$@"
+        ;;
+    fem-assembly)
+        exec "$VENV_PY" "$ROOT/fem/lid_trough_assembly.py" "$@"
+        ;;
+    drawings)
+        exec "$VENV_PY" "$ROOT/fem/assembly_sequence_svg.py" "$@"
+        ;;
+    python)
+        exec "$VENV_PY" "$@"
+        ;;
+    pip)
+        exec "$VENV_PY" -m pip "$@"
+        ;;
+    shell)
+        export VIRTUAL_ENV="$VENV"
+        export PATH="$VENV/bin:$PATH"
+        exec "${SHELL:-/bin/sh}"
+        ;;
+    *)
+        echo "Unknown command: $cmd" >&2
+        usage >&2
+        exit 2
+        ;;
+esac

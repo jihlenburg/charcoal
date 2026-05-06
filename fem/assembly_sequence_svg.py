@@ -2,8 +2,8 @@
 """Generate simple SVG assembly drawings for lid/trough insertion.
 
 Outputs:
-- output/assembly/lid_trough_assembly_sequence_v1_1_0.svg
-- output/assembly/lid_trough_snap_detail_v1_1_0.svg
+- output/assembly/lid_trough_assembly_sequence_v1_1_5.svg
+- output/assembly/lid_trough_snap_detail_v1_1_5.svg
 """
 
 from __future__ import annotations
@@ -45,33 +45,62 @@ def transform_xz(points, pivot_x, pivot_z, angle_deg, dx_mm, dz_mm):
 
 
 def trough_shapes(geom: Geometry):
-    outer = [(-31.0, 0.0), (31.0, 0.0), (31.0, 40.0), (-31.0, 40.0)]
-    cavity_main = [(-28.8, 2.2), (28.8, 2.2), (28.8, 37.5), (-28.8, 37.5)]
-    cavity_rabbet = [(-29.8, 37.5), (29.8, 37.5), (29.8, 40.0), (-29.8, 40.0)]
-    hook_pocket = [(-29.65, 34.3), (-28.8, 34.3), (-28.8, 35.6), (-29.65, 35.6)]
-    snap_slot = [(28.8, 28.6), (31.0, 28.6), (31.0, 29.4), (28.8, 29.4)]
-    return outer, cavity_main, cavity_rabbet, hook_pocket, snap_slot
+    body_half = geom.size_x / 2.0
+    cavity_half = geom.cavity_x / 2.0
+    rabbet_half = cavity_half + 1.0
+    hook_pocket_outer = -(cavity_half + geom.hook_slot_depth)
+    hook_lead_outer = -(cavity_half + geom.hook_slot_lead_depth)
+
+    outer = [(-body_half, 0.0), (body_half, 0.0), (body_half, 40.0), (-body_half, 40.0)]
+    cavity_main = [(-cavity_half, 2.2), (cavity_half, 2.2), (cavity_half, 37.5), (-cavity_half, 37.5)]
+    cavity_rabbet = [(-rabbet_half, 37.5), (rabbet_half, 37.5), (rabbet_half, 40.0), (-rabbet_half, 40.0)]
+    hook_pocket = [
+        (hook_pocket_outer, geom.hook_slot_bottom_z),
+        (-cavity_half, geom.hook_slot_bottom_z),
+        (-cavity_half, geom.hook_slot_roof_z),
+        (hook_pocket_outer, geom.hook_slot_roof_z),
+    ]
+    hook_lead = [
+        (hook_lead_outer, geom.hook_slot_roof_z),
+        (-cavity_half, geom.hook_slot_roof_z),
+        (-cavity_half, geom.arm_top_z),
+        (hook_lead_outer, geom.arm_top_z),
+    ]
+    snap_slot = [(cavity_half, 28.6), (body_half, 28.6), (body_half, 29.4), (cavity_half, 29.4)]
+    return outer, cavity_main, cavity_rabbet, hook_pocket, hook_lead, snap_slot
 
 
 def lid_outline(geom: Geometry):
-    slab = [(-29.5, 37.5), (29.5, 37.5), (29.5, 40.0), (-29.5, 40.0)]
-    passive_relief_lo = [(-29.5, 37.5), (-27.9, 37.5), (-29.5, 39.1)]
-    passive_relief_hi = [(-29.5, 40.0), (-27.9, 40.0), (-29.5, 38.4)]
+    lid_half = geom.lid_x / 2.0
+    cavity_half = geom.cavity_x / 2.0
+    hook_capture_x = -lid_half + geom.hook_rail_capture
+    hook_depth_x = -lid_half + geom.hook_rail_depth
+    hook_nose_x = -lid_half - geom.hook_nose_outboard
+    hook_nose_cham_x = hook_nose_x + geom.hook_tip_cham
+    hook_nose_cham_z = 34.5 + geom.hook_tip_cham
+    arm_inner_x = cavity_half - 1.0
+    arm_outer_x = cavity_half
+    snap_lip_x = cavity_half + geom.hook_protr
+
+    slab = [(-lid_half, 37.5), (lid_half, 37.5), (lid_half, 40.0), (-lid_half, 40.0)]
+    passive_relief_lo = [(-lid_half, 37.5), (-lid_half + 1.6, 37.5), (-lid_half, 39.1)]
+    passive_relief_hi = [(-lid_half, 40.0), (-lid_half + 1.6, 40.0), (-lid_half, 38.4)]
     hook = [
-        (-28.9, 37.5),
-        (-28.0, 37.5),
-        (-28.0, 34.5),
-        (-29.5, 34.5),
-        (-28.9, 35.4),
+        (hook_capture_x, 37.5),
+        (hook_depth_x, 37.5),
+        (hook_depth_x, 34.5),
+        (hook_nose_cham_x, 34.5),
+        (hook_nose_x, hook_nose_cham_z),
+        (hook_capture_x, 35.4),
     ]
     snap = [
-        (27.8, 37.5),
-        (28.8, 37.5),
-        (28.8, 27.3),
-        (29.8, 28.8),
-        (29.8, 29.2),
-        (28.8, 32.0),
-        (28.8, 37.5),
+        (arm_inner_x, 37.5),
+        (arm_outer_x, 37.5),
+        (arm_outer_x, 27.3),
+        (snap_lip_x, 28.8),
+        (snap_lip_x, 29.2),
+        (arm_outer_x, 32.0),
+        (arm_outer_x, 37.5),
     ]
     return slab, passive_relief_lo, passive_relief_hi, hook, snap
 
@@ -89,13 +118,13 @@ def svg_header(width, height):
 
 
 def draw_trough(panel_x, panel_y, scale, geom: Geometry):
-    outer, cavity_main, cavity_rabbet, hook_pocket, snap_slot = trough_shapes(geom)
+    outer, cavity_main, cavity_rabbet, hook_pocket, hook_lead, snap_slot = trough_shapes(geom)
     items = []
     items.append(
         f'  <polygon points="{mm_to_svg(outer, panel_x, panel_y, scale)}" '
         'fill="#d1d5db" stroke="#4b5563" stroke-width="2"/>\n'
     )
-    for void in (cavity_main, cavity_rabbet, hook_pocket, snap_slot):
+    for void in (cavity_main, cavity_rabbet, hook_pocket, hook_lead, snap_slot):
         items.append(
             f'  <polygon points="{mm_to_svg(void, panel_x, panel_y, scale)}" '
             'fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>\n'
@@ -129,7 +158,7 @@ def draw_lid(panel_x, panel_y, scale, geom: Geometry, angle_deg, dx_mm, dz_mm, o
     return "".join(items)
 
 
-def generate_sequence_svg(out_path: Path, geom: Geometry, angle_deg: float, dx_mm: float, dz_mm: float, snap_mm: float):
+def generate_sequence_svg(out_path: Path, geom: Geometry, angle_deg: float, dx_mm: float, dz_mm: float, lift_mm: float, snap_mm: float):
     width = 1140
     height = 420
     scale = 4.6
@@ -137,7 +166,7 @@ def generate_sequence_svg(out_path: Path, geom: Geometry, angle_deg: float, dx_m
     panel_xs = [165, 540, 915]
     svg = [svg_header(width, height)]
     svg.append('  <rect x="0" y="0" width="1140" height="420" fill="#ffffff"/>\n')
-    svg.append('  <text x="28" y="36" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#111827">Deckelmontage v1.1.0</text>\n')
+    svg.append(f'  <text x="28" y="36" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#111827">Deckelmontage v{geom.version}</text>\n')
     svg.append('  <text x="28" y="62" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#374151">Passive -X-Hakenleiste zuerst einhängen, dann nach unten rotieren, zuletzt +X-Schnapperseite drücken.</text>\n')
 
     for x in (20, 395, 770):
@@ -156,7 +185,7 @@ def generate_sequence_svg(out_path: Path, geom: Geometry, angle_deg: float, dx_m
     svg.append(draw_trough(panel_xs[1], panel_y, scale, geom))
     svg.append(draw_lid(panel_xs[1], panel_y, scale, geom, angle_deg, dx_mm, dz_mm))
     svg.append('  <path d="M465,153 C520,118 590,118 638,165" fill="none" stroke="#111827" stroke-width="2.5" marker-end="url(#arrow)"/>\n')
-    svg.append(f'  <text x="418" y="158" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Gefundene Hook-first-Lage: {angle_deg:.0f}°, +X-Kante ~13.9 mm höher.</text>\n')
+    svg.append(f'  <text x="418" y="158" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Gefundene Hook-first-Lage: {angle_deg:.0f}°, +X-Kante ~{lift_mm:.1f} mm höher.</text>\n')
     svg.append('  <text x="418" y="176" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Diese Lage ist jetzt ohne harte Kollision erreichbar.</text>\n')
 
     # Step 3
@@ -185,13 +214,15 @@ def generate_snap_detail_svg(out_path: Path, geom: Geometry, snap_mm: float):
     svg.append('  <text x="24" y="58" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#374151">Schnittprinzip im X-Z: starre Trogwand, elastische Rastnase am Deckel.</text>\n')
 
     # Right wall with slot
-    wall = [(28.8, 20.0), (31.0, 20.0), (31.0, 37.5), (28.8, 37.5)]
-    slot = [(28.8, 28.6), (31.0, 28.6), (31.0, 29.4), (28.8, 29.4)]
+    body_half = geom.size_x / 2.0
+    cavity_half = geom.cavity_x / 2.0
+    wall = [(cavity_half, 20.0), (body_half, 20.0), (body_half, 37.5), (cavity_half, 37.5)]
+    slot = [(cavity_half, 28.6), (body_half, 28.6), (body_half, 29.4), (cavity_half, 29.4)]
     svg.append(f'  <polygon points="{mm_to_svg(wall, origin_x, origin_y, scale)}" fill="#d1d5db" stroke="#4b5563" stroke-width="2"/>\n')
     svg.append(f'  <polygon points="{mm_to_svg(slot, origin_x, origin_y, scale)}" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>\n')
 
     # Open-position tab and closed-position tab
-    open_tab = [(27.8, 37.5), (28.8, 37.5), (28.8, 27.3), (29.8, 28.8), (29.8, 29.2), (28.8, 32.0), (28.8, 37.5)]
+    _, _, _, _, open_tab = lid_outline(geom)
     closed_tab = [(x - snap_mm, z) for x, z in open_tab]
     svg.append(f'  <polygon points="{mm_to_svg(open_tab, origin_x, origin_y, scale)}" fill="#93c5fd" fill-opacity="0.35" stroke="#2563eb" stroke-width="2" stroke-dasharray="6 4"/>\n')
     svg.append(f'  <polygon points="{mm_to_svg(closed_tab, origin_x, origin_y, scale)}" fill="#60a5fa" fill-opacity="0.90" stroke="#1d4ed8" stroke-width="2"/>\n')
@@ -216,16 +247,18 @@ def main() -> int:
     result = analyze(lid_mesh, trough_mesh, geom, penetration_tol_mm=0.15)
 
     out_dir = root / "output" / "assembly"
+    version_slug = geom.version.replace(".", "_")
     generate_sequence_svg(
-        out_dir / "lid_trough_assembly_sequence_v1_1_0.svg",
+        out_dir / f"lid_trough_assembly_sequence_v{version_slug}.svg",
         geom=geom,
         angle_deg=result.best_pose.angle_deg,
         dx_mm=result.best_pose.dx_mm,
         dz_mm=result.best_pose.dz_mm,
+        lift_mm=result.best_pose.plus_edge_lift_mm,
         snap_mm=max(0.0, result.closing_path.snap_max_interference_mm),
     )
     generate_snap_detail_svg(
-        out_dir / "lid_trough_snap_detail_v1_1_0.svg",
+        out_dir / f"lid_trough_snap_detail_v{version_slug}.svg",
         geom=geom,
         snap_mm=max(0.0, result.closing_path.snap_max_interference_mm),
     )

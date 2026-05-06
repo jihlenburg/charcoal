@@ -1,6 +1,6 @@
 # Aktivkohlefilter-Einsatz (Passivlüftung mit aktiven Absaugungen)
 
-**Version: 1.1.0** (im Script als `VERSION`-Konstante; wird als Gravur auf
+**Version: 1.1.5** (im Script als `VERSION`-Konstante; wird als Gravur auf
 den +Y-Flanschüberstand aufgebracht und muss beim Bump synchron mitgeführt
 werden: `carbon_filter_build123d.py` → README → git-Tag).
 
@@ -26,7 +26,7 @@ Z horizontal zur Schachttiefe wird.
    dabei über ihre Auslöserampe selbsttätig aus, während die Hakenleiste auf
    der Gegenseite den Deckel in ihrer Tasche hält und die Öffnungsseite definiert
 2. Filtervlies auf den Boden legen (3 mm, dichtet Hex gegen Granulatdurchfall)
-3. Aktivkohlegranulat einfüllen (~29 mm Schüttung, ~78 g bei 450 kg/m³)
+3. Aktivkohlegranulat einfüllen (~29 mm Schüttung, ~71 g bei 450 kg/m³)
 4. Zweites Filtervlies obenauf
 5. Deckel erst mit der Hakenleiste in die Gegentasche einsetzen, dann die
    Schnapper-Seite herunterdrücken bis beide Nasen hörbar einrasten
@@ -47,7 +47,7 @@ eingeschoben, der **Boden zeigt nach vorne** in die Wohnung. Gründe:
 - Der Flansch am Boden fungiert als **Einschub-Stopper und Fingergriff**.
   Er ragt **nur in Y-Richtung** (vertikal im Schacht) über den Körper
   hinaus — in X bleibt er auf Körperbreite, weil die harte Schachtbreite
-  70 mm nicht überschritten werden darf. Flansch-Footprint: 62 × 113 mm vs.
+  70 mm nicht überschritten werden darf. Flansch-Footprint: 65 × 113 mm vs.
   Schacht-Hartöffnung 70 × 100 mm — die je 10 mm-Überstände oben und unten
   fangen an der Schacht-Frontkante und geben gleichzeitig bequem Platz für
   Daumen/Zeigefinger. Die Kassette steht damit `floor = 2.2 mm` aus der
@@ -69,13 +69,13 @@ Schaum.
 ## Geometrie
 
 - Zwei Teile: Grundkörper (Trog mit integriertem Flansch + Boden) und Deckel
-- Körper-Aussenmasse: **62 (X) × 93 (Y) × 40 (Z)** mm
-- Bodenflansch: **62 × 113 × 2.2** mm (Z = 0 … 2.2) — nur in Y breiter als Körper
+- Körper-Aussenmasse: **65 (X) × 93 (Y) × 40 (Z)** mm
+- Bodenflansch: **65 × 113 × 2.2** mm (Z = 0 … 2.2) — nur in Y breiter als Körper
   (je 10 mm Überstand oben und unten als Stopper + Fingergriff)
 - Wand 2.2 mm, Boden 2.2 mm, Deckel 2.5 mm
 - Hex-Perforation identisch auf **Boden** und **Deckel** (Z-Flächen):
   10 mm flat-to-flat, 1.2 mm Stegbreite, 4 mm Randabstand → 28 Löcher pro
-  Fläche, ~48 % Offenfläche (24 cm² auf 51 cm² Kavität)
+  Fläche, ~45 % Offenfläche (24 cm² auf 54 cm² Kavität)
 - Rabbet-Sitz am oberen Rand, 1.0 mm Schulter, 2.5 mm tief
 - Passungsspiel 0.30 mm pro Seite (MJF-Standard)
 - Kein Fingerausschnitt am Boden — die 10 mm Y-Flansch-Überstände oben und
@@ -106,14 +106,20 @@ Release).
 - Asymmetrische Verriegelung: **eine** passive Hakenleiste auf einer X-Seite,
   **zwei** Cantilever-Rastnasen auf der gegenüberliegenden X-Seite.
 - Passive Hakenleiste: 34 mm lang, 3 mm Absenkung, als **einfache**
-  Hakenleiste mit 1.5 mm Gesamttiefe, 0.6 mm Überdeckung und einer kurzen
-  schrägen Nase. Sie greift in eine flache rechteckige Tasche in der
-  Gegenseite und bleibt dabei gut entpulverbar und visuell klar.
+  Hakenleiste mit 2.1 mm Gesamttiefe, 1.0 mm starkem oberem Steg und einer
+  0.35 mm über die Deckelkante nach außen gezogenen Nase. Die reale
+  Überdeckung hinter der Trog-Innenwand steigt damit auf etwa **1.05 mm**.
+  Sie greift in eine flache rechteckige Tasche in der Gegenseite. Die Tasche
+  ist zweistufig: unten eine 1.35 mm tiefe Retentionstasche, oben nur ein
+  0.55 mm tiefer Einführkanal. Dadurch bleibt über der unteren Tasche eine
+  **0.80 mm** tiefe Material-Lippe, unter der die Haken-Nase sichtbar trägt.
+  Außen bleiben etwa **0.30 mm** Taschenluft. Die äußerste Haken-Nase ist mit
+  einer 0.2-mm-Fase entschärft.
 - Passive Montagefreistiche: an den beiden `-X`-Deckelecken ist in der
   Draufsicht je ein kleiner Eckfreistich (`1.6 × 8.0 mm`) ausgespart. Diese
   Entlastung sitzt bewusst **außerhalb** der mittigen Hakenleiste und dient
   nur dazu, die Hook-first-Kippmontage kollisionsfrei zu machen.
-- Rastnasen: 6 mm breit, 10.2 mm lang, 1.0 mm Armdicke, 1.0 mm
+- Rastnasen: 6 mm breit, 10.2 mm lang, 1.0 mm Armdicke, 1.1 mm
   Lippenüberstand, 1.5 mm Einführschräge, 0.4 mm Haltelänge, 2.8 mm
   Auslöserampe, 0.5 mm Armwurzel-Fillet.
 - Auf der Schnapper-Seite sitzt mittig eine kleine Zuglippe; die Trogwand hat
@@ -144,7 +150,7 @@ Geschlossener Zustand:
 
 - Auf der Schnapper-Seite halten die beiden Rastlippen gegen die Oberkante der
   Slots.
-- Auf der Gegenseite sitzt die einfache Hakenleiste mit etwa `0.6 mm`
+- Auf der Gegenseite sitzt die einfache Hakenleiste mit etwa `1.1 mm`
   Überdeckung unter dem Taschen-Dach.
 - Ein Aufwärtszug am Deckel wird daher nicht nur von den Schnappern, sondern
   als Moment zwischen Schnapper-Seite und Haken-Seite aufgenommen.
@@ -182,17 +188,17 @@ F = 3 · E · I · δ / L³
 I = b · t³ / 12
 ```
 
-mit `b = 6 mm`, `t = 1 mm`, `L = 10.2 mm`, `δ = hook_protr + fit_clear = 1.3 mm`
+mit `b = 6 mm`, `t = 1 mm`, `L = 10.2 mm`, `δ = hook_protr + fit_clear = 1.4 mm`
 und einem HP-PA12-Elastizitätsmodul von grob `E ≈ 1.65 … 2.20 GPa`
 (JF 5200/5600-Datenblattband).
 
 Ergebnis:
 
-- laterale Federkraft pro Schnapper: **ca. 3.0 … 4.0 N**
-- geschätzte Finger-Hebekraft gesamt: **ca. 2.8 … 3.7 N**
+- laterale Federkraft pro Schnapper: **ca. 3.3 … 4.4 N**
+- geschätzte Finger-Hebekraft gesamt: **ca. 3.3 … 4.4 N**
   für beide Schnapper zusammen, mit 2.8-mm-Auslöserampe und einer groben
   Reibannahme `μ ≈ 0.2`
-- Maximale Randfaserdehnung: **≈ 1.87 %**
+- Maximale Randfaserdehnung: **≈ 2.02 %**
 
 Damit ist die Bedienung realistisch **ohne Werkzeug** und mit einer einzigen
 Fingerbewegung. Die Schnapper müssen nicht separat gedrückt werden; beim
@@ -201,7 +207,7 @@ Anheben an der Zuglippe fahren sie über die Auslöserampe selbst nach innen.
 HPs Snap-Fit-Handbook empfiehlt als grobe Daumenregel eine zulässige Dehnung
 von weniger als `1/3` der Fliessdehnung. Mit HP-PA12 (`~9 … 11 %` Yield im
 5600-Datenblatt) ergibt sich damit ein Zielbereich `< 3.0 … 3.7 %`; die
-aktuellen `~1.87 %` liegen darunter. Für diesen Anwendungsfall
+aktuellen `~2.02 %` liegen darunter. Für diesen Anwendungsfall
 (wenige Öffnungszyklen pro Jahr) ist das für PA12 deutlich plausibler als die
 vorige kurze 7-mm-Geometrie.
 
@@ -210,9 +216,9 @@ vorige kurze 7-mm-Geometrie.
 Zusätzlich zur schnellen Balkenabschätzung gibt es jetzt eine lokale
 3D-FE-Analyse in `fem/snap_fit_fem.py`.
 Das Modell bildet **einen aktiven Schnapper** mit der aktuellen
-`v1.1.0`-Nasenform ab, belastet die reale Rastfläche mit `1 N` in `+X` und
+`v1.1.5`-Nasenform ab, belastet die reale Rastfläche mit `1 N` in `+X` und
 skaliert die Antwort dann auf die nötige Öffnungs-Auslenkung
-`hook_protr + fit_clear = 1.30 mm`.
+`hook_protr + fit_clear = 1.40 mm`.
 
 Wichtig:
 
@@ -228,14 +234,37 @@ Wichtig:
 Aktueller Stand mit `mesh_size = 0.25 mm` und nominal `E = 2150 MPa`:
 
 - laterale Federsteifigkeit pro Schnapper: **~7.3 N/mm**
-- nötige laterale Auslenkkraft pro Schnapper für `1.30 mm`: **~9.5 N**
-- geschätzte Gesamt-Hebekraft zum Öffnen: **~6.7 … 9.0 N**
-- maximale Hauptdehnung beim Öffnen: **~3.2 %**
+- nötige laterale Auslenkkraft pro Schnapper für `1.40 mm`: **~10.3 N**
+- geschätzte Gesamt-Hebekraft zum Öffnen: **~8.0 … 10.6 N**
+- maximale Hauptdehnung beim Öffnen: **~3.4 %**
 
 Damit bleibt werkzeugloses Öffnen weiterhin plausibel. Für wiederholtes
 Öffnen liegt die erste FE-Abschätzung noch innerhalb des HP-`1/3`-Proxybands
 für PA12 (`< 3.0 … 3.7 %`), aber mit kleinerer Reserve als die reine
 Balkenformel suggeriert.
+
+### Lokale FEM der passiven Hakenleiste
+
+Für die passive Hakenleiste gibt es zusätzlich `fem/hook_hold_fem.py`. Das
+Modell belastet den unteren Haken-Nasenbereich mit `1 N` nach unten, klemmt
+den oberen Steg als Deckelanschluss und skaliert die lineare Elastizität bis
+zum PA12-`1/3`-Proxyband.
+
+Aktueller Befund für `v1.1.5`:
+
+- reale Überdeckung hinter der Trog-Innenwand: **1.05 mm**
+- nötige bewusste `+X`-Verschiebung zum Aushängen: **~1.05 mm**
+- äußere Taschenluft: **0.30 mm**
+- Retentionslippe in der Trogwand: **0.80 mm** tiefer Materialüberhang
+- oberer Hakensteg: **1.00 mm** stark, **34 mm²** Querschnitt
+- vertikale lokale Steifigkeit der Hakenleiste: **~1027 N/mm**
+- PA12-`1/3`-Proxy-Haltekraft strukturell: **~174 … 213 N**
+
+Interpretation: Die PA12-Festigkeit der Hakenleiste ist nicht der begrenzende
+Faktor. Entscheidend war die Geometrie: `v1.1.3` hatte real nur etwa
+`0.70 mm` Untergriff und einen `0.40 mm` dünnen oberen Hakensteg. `v1.1.5`
+erhöht den Untergriff, macht den Haken selbst druckbarer und ergänzt eine
+sichtbare Retentionslippe in der Trogwand.
 
 ### Innenaufbau (Luftweg-Richtung: Deckel → Boden)
 
@@ -248,12 +277,18 @@ Partikel-Rückhalt und als Staubfilter wirken.
 
 ## Nutzung
 
+Die Python-Umgebung wird über `./run` automatisch als lokale `.venv/`
+angelegt und aus `requirements.txt` aktualisiert, sobald sich die
+Abhängigkeiten ändern. Der Wrapper wählt automatisch eine kompatible
+Python-Version im Bereich 3.9–3.12, weil die CAD/OCP-Native-Wheels nicht für
+jede neueste Python-Version verfügbar sind:
+
 ```bash
-pip install build123d ocp-vscode gmsh meshio scikit-fem trimesh rtree
+./run setup
 ```
 
 1. VSCode öffnen, Command Palette → „OCP CAD Viewer: Open Viewer"
-2. `python carbon_filter_build123d.py` ausführen
+2. `./run cad` ausführen
 3. Viewer-Panel: Maus zum Drehen, Scroll zum Zoomen
 
 Datei speichern triggert Live-Reload im Viewer. Beim Ausführen werden
@@ -263,14 +298,24 @@ automatisch die Exporte in `output/STEP/` (für STEP) und `output/STL/`
 `EXPLODED = True` hebt den Deckel 30 mm über den Trog; für die
 Zusammenbau-Ansicht auf `False` setzen.
 
+Für manuelle Python-/Pip-Kommandos innerhalb derselben Umgebung:
+
+```bash
+./run python --version
+./run pip list
+./run shell
+```
+
 ### FEM ausführen
 
 Die lokale Schnapper-Simulation läuft separat vom CAD-Export:
 
 ```bash
-python fem/snap_fit_fem.py
-python fem/snap_fit_fem.py --vtk output/FEM/snap_fit_v1_1_0.vtu
-python fem/snap_fit_fem.py --json output/FEM/snap_fit_v1_1_0.json
+./run fem-snap
+./run fem-snap --vtk output/FEM/snap_fit_v1_1_5.vtu
+./run fem-snap --json output/FEM/snap_fit_v1_1_5.json
+./run fem-hook
+./run fem-hook --json output/FEM/hook_hold_v1_1_5.json
 ```
 
 `--vtk` und `--json` legen Zielverzeichnisse wie `output/FEM/` bei Bedarf
@@ -293,29 +338,30 @@ den Deckel dann über Signed-Distance gegen das Trogmaterial.
 Lauf:
 
 ```bash
-python fem/lid_trough_assembly.py
-python fem/lid_trough_assembly.py --json output/FEM/lid_trough_assembly_v1_1_0.json
+./run fem-assembly
+./run fem-assembly --json output/FEM/lid_trough_assembly_v1_1_5.json
 ```
 
 Auch hier wird das Zielverzeichnis der JSON-Datei bei Bedarf automatisch
 angelegt.
 
-Aktueller Befund für `v1.1.0`:
+Aktueller Befund für `v1.1.5`:
 
-- beste gefundene Hook-first-Kipplage im Suchraum: **`-15°`**, `dx = +0.40 mm`,
-  `dz = +1.20 mm`
-- eingehakte Kipplage: **kollisionsfrei** (`max penetration = -0.125 mm`)
+- beste gefundene Hook-first-Kipplage im Suchraum: **`-10°`**, `dx = +0.40 mm`,
+  `dz = +0.90 mm`
+- eingehakte Kipplage: **kollisionsfrei** (`max penetration = -0.101 mm`)
 - vertikale Einfädelbahn bei dieser Kipplage: **kollisionsfrei**
 - Schließbahn in die Endlage: **ohne harte Kollision**;
   verbleibende Interferenz liegt nur an den aktiven Schnappern
-  (`snap ~0.98 mm`) und ist dort die beabsichtigte elastische Einfederung
+  (`snap ~0.93 mm`) und ist dort die beabsichtigte elastische Einfederung
 - harte Restpenetration außerhalb der Schnapper: **0 Punkte**
 
 Interpretation:
 
 - Die passive Hakenleiste funktioniert jetzt auch als **praktisch nutzbare
   Kipp-Einhakeachse**, weil die beiden passiven Deckelecken lokal entlastet
-  wurden.
+  wurden und die flache Haken-Tasche bis an die Rabbet-Unterseite als
+  Einführkanal geöffnet ist.
 - Die Hook-first-Montage ist damit geometrisch plausibel:
   erst passive Seite einhängen, dann herunterrotieren, zuletzt die
   +X-Schnapperseite eindrücken.
@@ -329,15 +375,15 @@ Interpretation:
 Die Montagefolge wird zusätzlich als SVG ausgegeben:
 
 ```bash
-python fem/assembly_sequence_svg.py
+./run drawings
 ```
 
 Das Script legt `output/assembly/` bei Bedarf automatisch an.
 
 Erzeugte Dateien:
 
-- `output/assembly/lid_trough_assembly_sequence_v1_1_0.svg`
-- `output/assembly/lid_trough_snap_detail_v1_1_0.svg`
+- `output/assembly/lid_trough_assembly_sequence_v1_1_5.svg`
+- `output/assembly/lid_trough_snap_detail_v1_1_5.svg`
 
 Das Sequenzblatt zeigt die Hook-first-Montage in drei Schritten, das
 Detailblatt die elastische Einfederung der aktiven Rastnase beim finalen
@@ -345,34 +391,34 @@ Eindrücken.
 
 ### Mesh-Heal für STL-Export (pymeshfix)
 
-Die OCCT-STL-Tessellation hinterlässt typischerweise ~0.02 % nicht-manifold
-Kanten und Selbstdurchdringungen an Tangenten­nähten von Fillets/Chamfers —
-Druck-Bureau-Slicer (Shapeways/Sculpteo/Protolabs) lehnen solche Meshes ab
-oder heilen automatisch mit ungewissem Ergebnis. Der Export ruft deshalb
-`_heal_stl()` nach dem `export_stl()` auf. Ist `pymeshfix` nicht installiert,
-läuft der Export trotzdem durch und protokolliert nur, dass der Heal-Schritt
-übersprungen wurde.
+Die OCCT-STL-Tessellation hinterlässt an Tangenten­nähten von
+Fillets/Chamfers teilweise offene Randloops und Selbstdurchdringungen.
+Der Export schreibt deshalb zuerst weiterhin STEP und eine direkte OCCT-STL,
+remesht die STEP-Dateien dann mit Gmsh zurück zu STL und lässt anschließend
+`pymeshfix` als finalen Topologie-Heal laufen. Ist `pymeshfix` nicht
+installiert, bleibt der Gmsh-remeshte STL-Stand erhalten; nur der finale
+Selbstdurchdringungs-Clean wird übersprungen.
 
 Verhalten:
 
-- **trough.stl**: typischerweise 1 Randloop + ~300 Selbstdurchdringungen
-  → nach Heal **0 / 0**, Volumen-Erhalt ≤ 0.5 %. Clean für Upload.
-- **lid.stl**: typischerweise 0 Randloops + ~80 Selbstdurchdringungen.
-  Hier schlägt die Heal-Kaskade fehl — die Durchdringungen sitzen
-  topologisch fundamental (hex-perforierte Platte + Snap-Arm-Wurzel),
-  pymeshfix's `strong_intersection_removal` kaskadiert in Komponenten­verlust
-  (Volumen fällt von 7.25 auf 0.04 cm³). Der Volumen-Wächter (≤ 5 %
-  Abnahme) bricht deshalb ab und behält das Original.
+- **trough.stl**: STEP→Gmsh ergibt eine wasserdichte STL; `pymeshfix` reduziert
+  danach 12 Selbstdurchdringungen auf 0, bei praktisch unverändertem Volumen
+  (`35.24 → 35.24 cm³`).
+- **lid.stl**: STEP→Gmsh ergibt ebenfalls eine wasserdichte STL; `pymeshfix`
+  reduziert danach 32 Selbstdurchdringungen auf 0, bei praktisch
+  unverändertem Volumen (`8.16 → 8.15 cm³`).
 
-**Upload-Empfehlung** (Stand 2026-04-18, ein Bureau-Round):
+**Upload-Empfehlung** (Stand `v1.1.5`):
 
-- `trough.stl` (geheilt) → akzeptiert.
-- `lid.stl` (ungeheilt, 83 Selbstdurchdringungen ~2.5 %) → ebenfalls
-  akzeptiert; das Bureau-Auto-Heal kommt damit klar.
-- `lid.step` bleibt als clean-by-construction-Option verfügbar, aber nicht
-  nötig für den Upload.
+- `trough.stl` und `lid.stl` sind die aktuellen STL-Upload-Kandidaten
+  (0 Randloops, 0 gemeldete Selbstdurchdringungen).
+- `trough.step` und `lid.step` bleiben als BRep-Fallbacks verfügbar.
 
-Optional: `pip install pymeshfix`.
+Optional: `./run --with-heal setup` installiert zusätzlich
+`requirements-heal.txt` (`pymeshfix`). Danach nutzt `./run cad` den
+finalen Heal-Schritt automatisch; ohne diese optionale Abhängigkeit läuft der
+Export weiterhin durch und protokolliert nur den übersprungenen
+`pymeshfix`-Clean.
 
 ## MJF-Optimierungen
 
@@ -458,8 +504,8 @@ Chamfer-Operationen schafft geschlossene Taschen.
 ## Tiefenauslegung (`size_z` — Luftstromrichtung)
 
 Kompromiss zwischen Kohlekapazität und Druckverlust durch die aktiven
-Absaugungen. Nutzbarer Bettquerschnitt `cavity_x × cavity_y ≈ 57.6 × 88.6 ≈
-51 cm²`, 6 parallele Pfade.
+Absaugungen. Nutzbarer Bettquerschnitt `cavity_x × cavity_y ≈ 60.6 × 88.6 ≈
+54 cm²`, 6 parallele Pfade.
 
 Druckverlust im AC-Granulatbett (Ergun, 3-mm-Pellets, ε ≈ 0.4):
 
@@ -469,8 +515,8 @@ Druckverlust im AC-Granulatbett (Ergun, 3-mm-Pellets, ε ≈ 0.4):
 | 1.0 m/s | ~8 Pa |
 | 1.5 m/s | ~17 Pa |
 
-Bei 40 mm `size_z` ergibt sich ein Kohlebett von 29.3 mm, Kapazität ~78 g pro
-Kassette bei Schüttdichte ~450 kg/m³ → ~470 g gesamt über 6 Kassetten.
+Bei 40 mm `size_z` ergibt sich ein Kohlebett von 29.3 mm, Kapazität ~71 g pro
+Kassette bei Schüttdichte ~450 kg/m³ → ~425 g gesamt über 6 Kassetten.
 Erwartete Standzeit in normaler Wohnluft: ~6 Monate. ΔP bei realistischem
 Arbeitspunkt (~0.5 m/s) ca. 50–80 Pa — verträglich mit
 Bad-/Küchenabsaugungen (typisch 40–100 Pa statisch).
@@ -480,23 +526,23 @@ vorhanden sind und längere Wechselintervalle gewünscht.
 
 ### Snap-Belastungs-Check
 
-Beim Entriegeln biegt sich der Arm um `hook_protr + fit_clear = 1.30 mm`.
+Beim Entriegeln biegt sich der Arm um `hook_protr + fit_clear = 1.40 mm`.
 Maximale Randfaserdehnung in einem Cantilever:
 
 ```
-ε = 3 · t · δ / (2 · L²) = 3 · 1.0 · 1.30 / (2 · 10.2²) ≈ 1.87 %
+ε = 3 · t · δ / (2 · L²) = 3 · 1.0 · 1.40 / (2 · 10.2²) ≈ 2.02 %
 ```
 
 HP-PA12 Yield liegt laut aktuellem Datenblatt bei grob `9 … 11 %`. Das
 HP-Handbook empfiehlt für Snap-Fits als Näherung `< 1/3` davon, also
-`< 3.0 … 3.7 %`. `1.87 %` liegt darunter. Das Script gibt den Wert beim Lauf
+`< 3.0 … 3.7 %`. `2.02 %` liegt darunter. Das Script gibt den Wert beim Lauf
 zusammen mit Kraftabschätzung und PA12-Band auf STDOUT aus.
 
-Die lokale FE-Analyse liefert konservativer **~3.2 % maximale Hauptdehnung**.
-Das bleibt ebenfalls noch im HP-Proxyband, liegt aber erkennbar naher an der
-Unterkante `3.0 %`. Genau deshalb ist die FE hier wertvoller als die reine
-Cantilever-Formel: sie setzt die Last an der realen Rastfläche und nicht am
-freien Armende an.
+Die lokale FE-Analyse liefert konservativer **~3.4 % maximale Hauptdehnung**.
+Das bleibt ebenfalls noch im HP-Proxyband, liegt aber mit bewusst kleiner
+Reserve in Richtung Oberkante. Genau deshalb ist die FE hier wertvoller als
+die reine Cantilever-Formel: sie setzt die Last an der realen Rastfläche und
+nicht am freien Armende an.
 
 ## Materialwahl PA12 vs. PA11
 
@@ -533,8 +579,15 @@ Script re-exportiert STEP/STL.
 
 ## Dateien
 
+- `run` — legt `.venv/` automatisch an, installiert Pip-Abhängigkeiten und
+  startet CAD-/FEM-/Zeichnungs-Kommandos
+- `requirements.txt` — Kernabhängigkeiten für CAD, Viewer, FEM und
+  Baugruppenprüfung
+- `requirements-heal.txt` — optionale STL-Heal-Abhängigkeit `pymeshfix`
 - `carbon_filter_build123d.py` — build123d-Script mit ocp-vscode-Viewer
 - `fem/snap_fit_fem.py` — lokale 3D-FEM für den aktiven Schnapper
+- `fem/hook_hold_fem.py` — lokale 3D-FEM und Geometriecheck für die passive
+  Hakenleiste
 - `fem/lid_trough_assembly.py` — Vollbaugruppen-Kontakt und Kippmontage-Check
 - `fem/assembly_sequence_svg.py` — erzeugt SVG-Montagezeichnungen
 - `README.md` — dieses Dokument

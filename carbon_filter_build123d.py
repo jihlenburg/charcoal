@@ -30,7 +30,7 @@ Why lid at the back, floor at the front:
 Insertion stop: the floor carries a flange that extends `flange_extra_y` mm
 beyond the body in Y ONLY (not in X — X is constrained by the 70 mm hard
 shaft opening, so any X-overshoot would block insertion). The flange is
-`floor` mm thick. Because its Y span (size_y + 2·flange_extra_y = 103 mm) is
+`floor` mm thick. Because its Y span (size_y + 2·flange_extra_y = 113 mm) is
 wider than the shaft hard height (100 mm), it catches on the shaft front
 frame at the top and bottom while passing cleanly through in X. The cassette
 protrudes `floor` mm (= 2.2 mm) from the opening — enough for finger access,
@@ -48,9 +48,9 @@ flush —
 Moosgummi strips on top and bottom of the cassette body provide the axial seal.
 
 Viewer:
-    pip install build123d ocp-vscode
+    ./run setup
     Launch "OCP CAD Viewer" in VSCode, then:
-        python carbon_filter_build123d.py
+        ./run cad
 Save the file to live-reload the viewer. Exports STEP + STL alongside.
 """
 
@@ -87,7 +87,7 @@ set_port(3939)
 # ---------------------------------------------------------------------------
 # Version (engraved onto the +Y flange overhang, apartment-facing side)
 # ---------------------------------------------------------------------------
-VERSION = "1.1.0"
+VERSION = "1.1.5"
 version_font = 5.0       # mm — fits the 10 mm Y-overhang comfortably
 version_depth = 0.6      # mm — recessed engraving; MJF prints this crisp
                          # without weakening the 2.2 mm flange floor
@@ -96,7 +96,7 @@ version_depth = 0.6      # mm — recessed engraving; MJF prints this crisp
 # Parameters (mm) — MJF-tuned, cassette's own frame (Z up during filling)
 # ---------------------------------------------------------------------------
 # Outer envelope of cassette body
-size_x = 62.0       # shaft width direction (foam contact both sides)
+size_x = 65.0       # shaft width direction (foam contact both sides)
 size_y = 93.0       # shaft vertical direction (hard walls top/bottom)
 size_z = 40.0       # shaft depth / airflow direction (bed + walls + lid)
 
@@ -137,17 +137,21 @@ hex_margin_y = 4.0
 retainer_y_offset = 18.0
 hook_rail_width = 34.0
 hook_rail_drop = 3.0
-hook_rail_depth = 1.5
-hook_rail_capture = 0.6
+hook_rail_depth = 2.1
+hook_rail_capture = 1.1
+hook_nose_outboard = 0.35
 hook_rail_nose_height = 0.9
+hook_tip_cham = 0.2
 hook_slot_w = hook_rail_width + 0.6
-hook_slot_h = hook_rail_nose_height + 0.4
-hook_slot_depth = hook_rail_capture + 0.25
+hook_slot_depth = 1.35
+hook_slot_lead_depth = 0.55
+hook_slot_floor_clearance = 0.4
+hook_slot_roof_clearance = 0.35
 
 hook_width = 6.0
 hook_arm = 1.0
 hook_length = 10.2
-hook_protr = 1.0
+hook_protr = 1.1
 hook_lead = 1.5
 hook_hold = 0.4
 hook_release = 2.8
@@ -180,8 +184,8 @@ lid_corner_fil = 1.0     # vertical corner fillet of the lid slab (handling)
 lid_top_cham = 0.5       # chamfer on lid top outer edges (finish + no chipping)
 lid_bot_cham = 0.2       # chamfer on lid bottom outer edges (rabbet lead-in).
                          # 0.3 mm conflicts via OCCT with the 0.5 mm snap-arm
-                         # root fillet on the X-side (tab attach at X≈28.8 is
-                         # 0.7 mm from the X-perim edge at 29.5); 0.2 mm clears.
+                         # root fillet on the X-side (tab attach at X≈30.3 is
+                         # 0.7 mm from the X-perim edge at 31.0); 0.2 mm clears.
 flange_top_cham = 0.5    # chamfer on 4 body-corner "shelf" arcs at Z=floor.
                          # These arcs sit between the 2 mm body-corner cylinder
                          # fillet and the flange top plane — OCCT consistently
@@ -196,7 +200,7 @@ slot_w = hook_width + 0.6
 slot_h = hook_hold + 0.4
 retainer_y_offsets = (-retainer_y_offset, retainer_y_offset)
 
-# No finger recess: the 5 mm Y-flange overhangs (top and bottom) already
+# No finger recess: the 10 mm Y-flange overhangs (top and bottom) already
 # give a comfortable thumb/index grip for extracting the cassette. Any
 # extra pocket on the floor face weakens the plate and wastes open area.
 
@@ -222,11 +226,21 @@ flange_y = size_y + 2 * flange_extra_y      # Y overshoot catches on frame
 arm_top_z = size_z - lid_thk               # lid underside in cassette frame
 arm_tip_z = arm_top_z - hook_length
 catch_center_z = arm_tip_z + hook_lead + hook_hold / 2
-hook_slot_center_z = arm_top_z - hook_rail_drop + hook_rail_nose_height / 2
+hook_nose_bottom_z = arm_top_z - hook_rail_drop
+hook_nose_top_z = hook_nose_bottom_z + hook_rail_nose_height
+hook_slot_bottom_z = hook_nose_bottom_z - hook_slot_floor_clearance
+hook_slot_roof_z = hook_nose_top_z + hook_slot_roof_clearance
+hook_slot_full_h = hook_slot_roof_z - hook_slot_bottom_z
+hook_slot_full_center_z = (hook_slot_roof_z + hook_slot_bottom_z) / 2
+hook_slot_lead_h = arm_top_z - hook_slot_roof_z
+hook_slot_lead_center_z = (arm_top_z + hook_slot_roof_z) / 2
+hook_receiver_ledge_depth = hook_slot_depth - hook_slot_lead_depth
 slot_z_min = catch_center_z - slot_h / 2
 slot_z_max = catch_center_z + slot_h / 2
 
 carbon_bed_depth = size_z - floor - lid_thk - 2 * fleece_thk
+effective_hook_capture = lid_x / 2 + hook_nose_outboard - cavity_x / 2
+hook_pocket_outer_clearance = hook_slot_depth - effective_hook_capture
 
 
 # ---------------------------------------------------------------------------
@@ -463,13 +477,19 @@ with BuildPart() as trough_b:
                 RegularPolygon(radius=r_hex, side_count=6, rotation=90)
     extrude(amount=floor + 2.0, mode=Mode.SUBTRACT)
 
-    # Shallow hook pocket in the -X cavity wall. This is the intended middle
-    # ground: a real passive hold-down, but just one simple rectangular pocket
-    # under the rabbet shelf rather than a deep or topologically fancy latch.
+    # Passive hook receiver in the -X cavity wall. The lower cut is the real
+    # retaining pocket; the shallower upper cut is only a lead-in channel.
+    # Keeping the upper cut shallow leaves a material ledge above the lower
+    # pocket, so the hook nose has something visible and deliberate to bear
+    # under instead of relying on a nearly open vertical slot.
     with BuildSketch(Plane.YZ.offset(-cavity_x / 2)) as _:
-        with Locations((0.0, hook_slot_center_z)):
-            Rectangle(hook_slot_w, hook_slot_h)
+        with Locations((0.0, hook_slot_full_center_z)):
+            Rectangle(hook_slot_w, hook_slot_full_h)
     extrude(amount=-hook_slot_depth, mode=Mode.SUBTRACT)
+    with BuildSketch(Plane.YZ.offset(-cavity_x / 2)) as _:
+        with Locations((0.0, hook_slot_lead_center_z)):
+            Rectangle(hook_slot_w, hook_slot_lead_h)
+    extrude(amount=-hook_slot_lead_depth, mode=Mode.SUBTRACT)
 
     # Release notch on the +X snap side: removes only the local outer-wall
     # material above the rabbet so the lid lip is reachable by fingertip.
@@ -508,7 +528,8 @@ def make_hook_rail_proto():
                     (hook_rail_capture, 0.0),
                     (hook_rail_depth, 0.0),
                     (hook_rail_depth, -hook_rail_drop),
-                    (0.0, -hook_rail_drop),
+                    (-hook_nose_outboard + hook_tip_cham, -hook_rail_drop),
+                    (-hook_nose_outboard, -hook_rail_drop + hook_tip_cham),
                     (hook_rail_capture, -hook_rail_drop + hook_rail_nose_height),
                     close=True,
                 )
@@ -736,7 +757,7 @@ lift_factor = ((release_run_ratio + release_mu)
 lift_force = snap_spring_k * hook_protr * lift_factor
 lift_force_lo = snap_spring_k_lo * hook_protr * lift_factor
 lift_force_hi = snap_spring_k_hi * hook_protr * lift_factor
-hook_capture = hook_rail_capture
+hook_capture = effective_hook_capture
 allowable_strain_lo = pa12_yield_lo / 3.0
 allowable_strain_hi = pa12_yield_hi / 3.0
 
@@ -753,6 +774,8 @@ print(f"PA12 strain proxy target: <{allowable_strain_lo*100:.2f} … "
       f"{allowable_strain_hi*100:.2f} % "
       f"(= 1/3 of 9 … 11 % yield)")
 print(f"Hook capture at passive side: ~{hook_capture:.2f} mm")
+print(f"Hook pocket outer clearance:  ~{hook_pocket_outer_clearance:.2f} mm")
+print(f"Hook receiver ledge depth:    ~{hook_receiver_ledge_depth:.2f} mm")
 print(f"Snap force per tab:       ~{snap_force:.2f} N lateral "
       f"({snap_force_lo:.2f} … {snap_force_hi:.2f} N over PA12 modulus range)")
 print(f"Lift-open force total:    ~{2*lift_force:.2f} N "
@@ -803,9 +826,59 @@ def _mesh_volume_cm3(v, f) -> float:
     ) / 1000
 
 
+def _remesh_stl_from_step(step_path: Path, stl_path: Path, ref_volume_cm3: float) -> None:
+    """Re-mesh a STEP BRep with Gmsh and replace the STL if validation passes.
+
+    OCCT's direct STL tessellation can leave tiny open seams at tangent
+    transitions. Gmsh meshes the STEP topology as a joined
+    surface model, which gives pymeshfix a much cleaner starting point.
+    """
+    try:
+        import gmsh
+        import trimesh
+    except ModuleNotFoundError as exc:
+        print(f"  STEP remesh {stl_path.name}: skipped ({exc.name} not installed)")
+        return
+
+    import shutil
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        candidate = Path(tmp) / stl_path.name
+        gmsh.initialize()
+        try:
+            gmsh.option.setNumber("General.Terminal", 0)
+            gmsh.open(str(step_path))
+            gmsh.option.setNumber("Mesh.MeshSizeMin", 0.2)
+            gmsh.option.setNumber("Mesh.MeshSizeMax", 0.8)
+            gmsh.option.setNumber("Mesh.StlOneSolidPerSurface", 0)
+            gmsh.model.mesh.generate(2)
+            gmsh.write(str(candidate))
+        finally:
+            gmsh.finalize()
+
+        mesh = trimesh.load_mesh(candidate, force="mesh")
+        vol = abs(mesh.volume) / 1000
+        vol_delta = abs(vol - ref_volume_cm3) / ref_volume_cm3
+        if not mesh.is_watertight or not mesh.is_winding_consistent or vol_delta > 0.03:
+            print(
+                f"  STEP remesh {stl_path.name}: rejected "
+                f"(watertight={mesh.is_watertight}, "
+                f"winding={mesh.is_winding_consistent}, "
+                f"vol {vol:.2f} vs {ref_volume_cm3:.2f} cm³)"
+            )
+            return
+
+        shutil.copyfile(candidate, stl_path)
+        print(
+            f"  STEP remesh {stl_path.name}: accepted "
+            f"(faces={len(mesh.faces)}, vol={vol:.2f} cm³)"
+        )
+
+
 def _heal_stl(path: Path) -> None:
     """
-    Post-process an OCCT-tessellated STL for print-bureau acceptance.
+    Post-process an STL for print-bureau acceptance.
 
     Strategy:
       1. Diagnose the raw mesh (boundaries, self-intersections).
@@ -814,10 +887,8 @@ def _heal_stl(path: Path) -> None:
          volume preservation (±5 %) — pymeshfix's `clean()` can cascade
          through self-intersection removal into component loss on meshes
          with high-genus topology (e.g. the hex-perforated lid), where the
-         "repaired" result shrinks to a tiny fragment. On volume mismatch,
-         leave the original in place; the bureau's auto-heal usually handles
-         a handful of residual intersections, and the STEP export remains
-         the authoritative clean upload path.
+         "repaired" result shrinks to a tiny fragment. On volume mismatch
+         keep the prior STL and use the STEP export as fallback.
     """
     try:
         import pymeshfix
@@ -873,6 +944,17 @@ def _heal_stl(path: Path) -> None:
     )
 
 
+print("STEP remesh:")
+_remesh_stl_from_step(
+    step_dir / "trough.step",
+    stl_dir / "trough.stl",
+    trough.volume / 1000,
+)
+_remesh_stl_from_step(
+    step_dir / "lid.step",
+    stl_dir / "lid.stl",
+    lid.volume / 1000,
+)
 print("Mesh heal:")
 _heal_stl(stl_dir / "trough.stl")
 _heal_stl(stl_dir / "lid.stl")

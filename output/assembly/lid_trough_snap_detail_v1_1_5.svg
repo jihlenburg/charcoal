@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#111827"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="640" height="300" fill="#ffffff"/>
+  <text x="24" y="34" font-family="Arial, Helvetica, sans-serif" font-size="24" fill="#111827">Detail: aktive Schnapperseite</text>
+  <text x="24" y="58" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#374151">Schnittprinzip im X-Z: starre Trogwand, elastische Rastnase am Deckel.</text>
+  <polygon points="407.2,142.0 423.8,142.0 423.8,10.8 407.2,10.8" fill="#d1d5db" stroke="#4b5563" stroke-width="2"/>
+  <polygon points="407.2,77.5 423.8,77.5 423.8,71.5 407.2,71.5" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+  <polygon points="399.8,10.8 407.2,10.8 407.2,87.2 415.5,76.0 415.5,73.0 407.2,52.0 407.2,10.8" fill="#93c5fd" fill-opacity="0.35" stroke="#2563eb" stroke-width="2" stroke-dasharray="6 4"/>
+  <polygon points="392.8,10.8 400.3,10.8 400.3,87.2 408.6,76.0 408.6,73.0 400.3,52.0 400.3,10.8" fill="#60a5fa" fill-opacity="0.90" stroke="#1d4ed8" stroke-width="2"/>
+  <line x1="347" y1="136" x2="305" y2="136" stroke="#111827" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="362" y="141" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#374151">Elastische X-Auslenkung ~0.9 mm</text>
+  <text x="24" y="96" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#374151">Hellblau gestrichelt: freie Rastnase vor Kontakt</text>
+  <text x="24" y="116" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#374151">Blau: eingefederte Rastnase während des Eindrückens</text>
+  <text x="24" y="136" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#374151">Nach der Slotkante springt die Nase wieder nach außen.</text>
+</svg>

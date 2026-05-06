@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Local linear-elastic FEM for the v1.1.0 snap tab.
+"""Local linear-elastic FEM for the v1.1.5 snap tab.
 
 This is intentionally a focused Phase-1 model:
 
 - one active snap tab only
-- current v1.1.0 nose geometry
+- current v1.1.5 nose geometry
 - 3D tetra mesh generated with Gmsh
 - solved with scikit-fem as small-strain linear elasticity
 - load applied on the real catch face, not at the absolute tip
@@ -30,7 +30,7 @@ try:
 except ImportError as exc:  # pragma: no cover - dependency guard
     raise SystemExit(
         "Missing FEM dependency. Install with:\n"
-        "  pip install gmsh meshio scikit-fem"
+        "  ./run setup"
     ) from exc
 
 try:
@@ -47,17 +47,17 @@ try:
 except ImportError as exc:  # pragma: no cover - dependency guard
     raise SystemExit(
         "Missing FEM dependency. Install with:\n"
-        "  pip install gmsh meshio scikit-fem"
+        "  ./run setup"
     ) from exc
 
 
 @dataclass(frozen=True)
 class SnapGeometry:
-    version: str = "1.1.0"
+    version: str = "1.1.5"
     hook_width: float = 6.0
     hook_arm: float = 1.0
     hook_length: float = 10.2
-    hook_protr: float = 1.0
+    hook_protr: float = 1.1
     hook_lead: float = 1.5
     hook_hold: float = 0.4
     hook_release: float = 2.8
@@ -118,7 +118,7 @@ class FemResult:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Local FEM for the v1.1.0 PA12 snap tab."
+        description="Local FEM for the v1.1.5 PA12 snap tab."
     )
     parser.add_argument(
         "--mesh-size",
@@ -474,7 +474,7 @@ def print_report(result: FemResult) -> None:
     print(
         "Note:                     This model resolves the real catch face and "
         "is therefore more conservative than the simple cantilever formula. "
-        "The actual v1.1.0 arm-root fillet is not modeled explicitly here."
+        "The actual v1.1.5 arm-root fillet is not modeled explicitly here."
     )
 
 

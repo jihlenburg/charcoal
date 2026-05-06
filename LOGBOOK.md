@@ -2,6 +2,118 @@
 
 Chronologisches Protokoll der Design- und Toolchain-Entscheidungen.
 
+## 2026-05-06
+
+### Trogseitige Haken-Retentionslippe ergänzt, Release v1.1.5
+
+Der v1.1.4-Haken selbst war deutlich kräftiger, im X-Z-Schnitt war aber
+sichtbar, dass die Trogseite noch eher wie eine offene Seitennut als wie eine
+bewusste Gegenraste wirkte. Die Tasche wurde deshalb zweistufig gemacht:
+
+- `VERSION = "1.1.5"`
+- untere Retentionstasche: 1.35 mm tief
+- oberer Einführkanal: nur 0.55 mm tief
+- verbleibende trogseitige Materiallippe: 0.80 mm tief
+- reale Hakenüberdeckung bleibt 1.05 mm
+- äußere Taschenluft bleibt 0.30 mm
+- äußerste Haken-Nase mit 0.2-mm-Fase entschärft
+
+Damit greift die Haken-Nase nicht mehr in eine fast vollständig offene
+Vertikalnut, sondern sichtbar unter eine Retentionslippe. Die obere flachere
+Tasche bleibt als Einführhilfe für die Hook-first-Montage erhalten.
+
+Validierung:
+
+- `./run --with-heal cad`: STEP/STL neu erzeugt, Viewer aktualisiert
+- `./run fem-hook`: lokale Steifigkeit ~1027 N/mm;
+  PA12-`1/3`-Proxy-Haltekraft ~174 … 213 N
+- `./run fem-snap`: unverändert zu v1.1.4/v1.1.3, nominal ~10.4 N
+  Öffnungskraft
+- `./run fem-assembly`: Hook-first-Pfad weiterhin plausibel;
+  beste Lage `-10°`, `dx = +0.40 mm`, `dz = +0.90 mm`,
+  harte Restpenetration 0 Punkte, Schnapper-Interferenz ~0.93 mm
+- STL-Diagnose: beide finalen STLs wasserdicht, 0 Randloops,
+  0 Selbstdurchdringungen
+
+### Passive Hakenleiste verstärkt und Haltekraft geprüft, Release v1.1.4
+
+Die v1.1.3-Hakenleiste wurde nach haptischer Rückmeldung nochmals separat
+geprüft. Wichtiges Ergebnis: `hook_rail_capture = 1.1 mm` war nicht die reale
+Überdeckung hinter der Trog-Innenwand. Wegen Deckelspiel/Rabbet-Geometrie lag
+der tatsächliche Untergriff nur bei etwa `0.70 mm`. Zusätzlich war der obere
+Steg der Hakenleiste durch `hook_rail_depth - hook_rail_capture` nur `0.40 mm`
+stark und damit für MJF unnötig filigran.
+
+Geometrieänderung:
+
+- `VERSION = "1.1.4"`
+- `hook_nose_outboard = 0.35 mm`
+- `hook_rail_depth` 1.5 → 2.1 mm
+- realer Untergriff hinter der Trog-Innenwand: 0.70 → 1.05 mm
+- äußere Taschenluft bleibt bei 0.30 mm
+- oberer Hakensteg: 0.40 → 1.00 mm, Querschnitt 34 mm²
+
+Neuer Hook-Solver `fem/hook_hold_fem.py`:
+
+- lokales lineares PA12-FEM der mittigen Hakenleiste
+- oberer Steg am Deckelanschluss geklemmt
+- 1 N nach unten auf den unteren Haken-Nasenbereich
+- Ergebnis `v1.1.4`: lokale Steifigkeit ~810 N/mm
+- PA12-`1/3`-Proxy-Haltekraft strukturell ~103 … 125 N
+- Yield-Strain-Skalierung ~308 … 376 N
+
+Interpretation: Für die passive Hakenleiste ist nicht die PA12-Festigkeit der
+limitierende Punkt, sondern die Geometrie des Untergriffs. v1.1.4 macht den
+Untergriff klarer und den Haken selbst druckbarer, ohne die Tasche tiefer zu
+schneiden.
+
+Validierung nach Neuaufbau:
+
+- `./run --with-heal cad`: STEP/STL neu erzeugt, beide STLs geheilt
+- `./run fem-hook`: bestanden, Haltekraft-/Geometriecheck wie oben
+- `./run fem-snap`: unverändert zu v1.1.3, nominal ~10.4 N Öffnungskraft
+- `./run fem-assembly`: Hook-first-Pfad weiterhin plausibel;
+  beste Lage `-10°`, `dx = +0.40 mm`, `dz = +1.20 mm`,
+  harte Restpenetration 0 Punkte, Schnapper-Interferenz ~0.93 mm
+
+### Aktive Schnapper moderat straffer gemacht, Release v1.1.3
+
+Nach Rückmeldung vom Druckmuster sollte der aktive Schnappverschluss spürbar,
+aber nicht drastisch, straffer werden. Die passive Haken-Seite und die
+65-mm-Breite bleiben unverändert; geändert wurde nur der aktive
+Lippenüberstand:
+
+- `VERSION = "1.1.3"`
+- `hook_protr` 1.0 → 1.1 mm
+- Öffnungs-Auslenkung `hook_protr + fit_clear`: 1.30 → 1.40 mm
+
+Validierung nach Neuaufbau mit `./run --with-heal cad`:
+
+- Körper bleibt `65 × 93 × 40 mm`, Flansch `65 × 113 × 2.2 mm`
+- schnelle Balkenabschätzung: `~4.25 N` lateral pro Schnapper,
+  `~4.30 N` Gesamt-Hebekraft
+- STEP→Gmsh→pymeshfix bleibt für beide STLs wasserdicht; Diagnostics melden
+  0 Randloops und 0 Selbstdurchdringungen
+
+Lokale FEM `./run fem-snap`:
+
+- laterale Federsteifigkeit pro Schnapper: `~7.34 N/mm`
+- laterale Auslenkkraft für `1.40 mm`: `~10.28 N` pro Schnapper
+- abgeleitete Gesamt-Hebekraft: `~7.98 … 10.64 N`, nominal `~10.39 N`
+- maximale Hauptdehnung: `~3.43 %`
+
+Baugruppen-Checker `./run fem-assembly`:
+
+- beste gefundene Hook-first-Lage bleibt `-10°`, `dx = +0.40 mm`,
+  `dz = +0.90 mm`
+- eingehakte Lage kollisionsfrei (`max penetration = -0.088 mm`)
+- Schliessbahn ohne harte Kollision; harte Restpenetration 0 Punkte
+- beabsichtigte Schnapper-Einfederung im Kontaktmodell: `snap ~0.94 mm`
+
+Schlussfolgerung: Die v1.1.3-Änderung hebt den FEM-Hebewiderstand von etwa
+8.8 N auf etwa 10.4 N an. Das sollte taktil merklich straffer sein, bleibt
+aber noch im PA12-`1/3`-Proxyband mit bewusst kleiner Reserve.
+
 ## 2026-04-19
 
 ### Vollbaugruppen-Kontakt für Deckel gegen Trog
@@ -597,3 +709,99 @@ Sammelrelease der seit v1.0.0 kumulierten Änderungen:
 
 Versionssprung von v1.0.0 direkt auf v1.0.2 (die v1.0.1-Gravur-Arbeit
 wurde nie getaggt; der Bump geht in einem Commit auf).
+
+## 2026-05-06
+
+### Automatische Pip-/Venv-Umgebung
+
+Der Projektworkflow nutzt jetzt einen lokalen Wrapper `./run`, der eine
+`.venv/` im Repo anlegt und die Pip-Abhängigkeiten aus `requirements.txt`
+installiert. Die Installation wird über einen Hash-Stempel nur wiederholt,
+wenn sich das Manifest ändert. Der Wrapper wählt automatisch eine Python-
+Version im Bereich 3.9–3.12, da die CAD/OCP-Native-Wheels nicht zuverlässig
+für jede neueste Python-Version bereitstehen.
+
+**Kommandos**:
+
+- `./run setup` erstellt bzw. aktualisiert die Umgebung
+- `./run cad` startet das build123d-/ocp-vscode-Script
+- `./run fem-snap` startet die lokale Schnapper-FEM
+- `./run fem-assembly` startet die Vollbaugruppen-Kontaktprüfung
+- `./run drawings` erzeugt die Montage-SVGs
+- `./run python ...`, `./run pip ...` und `./run shell` geben direkten
+  Zugriff auf dieselbe Umgebung
+
+**Optionale Heal-Abhängigkeit**: `pymeshfix` liegt bewusst in
+`requirements-heal.txt` und wird nur mit `./run --with-heal setup`
+installiert. Grund: Der normale CAD-/FEM-Workflow soll nicht an möglichen
+VTK-/pymeshfix-Installationsproblemen hängen. Ohne `pymeshfix` bleibt der
+STL-Export lauffähig; der Heal-Schritt wird wie bisher nur protokolliert
+übersprungen.
+
+**Verworfene Alternative**: Automatisches `pip install` direkt in den
+CAD-/FEM-Scripts. Das würde Importe mit Netzwerk-/Installer-Seiteneffekten
+vermischen und Fehler schwerer lesbar machen. Der Wrapper hält die Umgebung
+reproduzierbar, ohne die Modell- und Analyse-Scripts mit Setup-Logik zu
+belasten.
+
+### Breite nach Druckmuster-Fit auf 65 mm erhöht, Hook verstärkt und STL-Export remesht, Release v1.1.2
+
+Nach Rückmeldung am gedruckten Muster ist in X-Richtung deutlich mehr Platz
+im Schacht als mit `size_x = 62 mm` genutzt wurde. Die Baugruppe wurde daher
+auf `size_x = 65 mm` verbreitert; der Bodenflansch bleibt ohne X-Überstand
+und folgt der Körperbreite, also jetzt `65 × 113 × 2.2 mm`.
+
+**Geometrie-Folgen**:
+
+- `VERSION = "1.1.2"`; die neue Geometrie ist damit auch in der
+  Flanschgravur sichtbar.
+- Nutzbarer Bettquerschnitt steigt auf `60.6 × 88.6 mm` (~54 cm²).
+- Kohlebettvolumen bei `29.3 mm` Bettiefe: ~157 cm³, also ~71 g
+  Aktivkohle bei 450 kg/m³ Schüttdichte.
+- Hex-Pattern bleibt bei 28 Löchern pro Seite; durch die grössere Kavität
+  sinkt die relative Offenfläche auf ~45 %, absolute Öffnungsfläche bleibt
+  ~24 cm².
+- Passive Haken-Überdeckung wurde nach Druckmuster-Feedback von `0.6 mm`
+  auf `1.1 mm` erhöht. Die Tasche folgt mit `1.35 mm` Tiefe und lässt noch
+  ~0.85 mm Restwand in der X-Seitenwand stehen.
+
+**Passive Haken-Tasche**: Der erste Checker-Lauf mit nur verbreitertem X
+fand zwar eine kollisionsfreie eingehakte Lage, aber die vereinfachte
+vertikale Einfädelbahn hatte eine harte Restpenetration an der passiven
+Hakenleiste. Die Tasche wurde deshalb von der reinen Nasenhöhe auf einen
+3.4-mm-hohen Einführkanal bis zur Rabbet-Unterseite erweitert. Die Tasche
+bleibt flach genug, gut entpulverbar und hat trotz stärkerem Haken noch
+Restwand auf der X-Seite.
+
+**Aktueller Baugruppen-Checker `v1.1.2`**:
+
+- beste gefundene Hook-first-Lage: `-10°`, `dx = +0.40 mm`, `dz = +0.90 mm`
+- eingehakte Lage kollisionsfrei (`max penetration = -0.089 mm`)
+- vertikale Einfädelbahn kollisionsfrei
+- Schliessbahn ohne harte Kollision; verbleibende Interferenz nur an den
+  aktiven Schnappern (`snap ~1.03 mm`)
+
+**STL-Heal-Status**:
+
+- Direkte OCCT-STLs bleiben als Zwischenprodukt erhalten, werden aber nicht
+  mehr als finale STL betrachtet.
+- Neuer Pfad: STEP-Datei mit Gmsh zu STL remeshen, dann mit `pymeshfix`
+  final reinigen.
+- `trough.stl`: Gmsh-Remesh wasserdicht; `pymeshfix` reduziert
+  12 Selbstdurchdringungen auf 0, Volumen 35.19 → 35.19 cm³.
+- `lid.stl`: Gmsh-Remesh wasserdicht; `pymeshfix` reduziert
+  32 Selbstdurchdringungen auf 0, Volumen 8.09 → 8.08 cm³.
+
+**Verworfene Alternativen**:
+
+- _Bei 62 mm bleiben_: nach Druckmuster-Fit unnötig konservativ, lässt
+  nutzbaren Schachtquerschnitt ungenutzt.
+- _X-Flansch über den Körper hinaus verbreitern_: würde die harte
+  70-mm-Schachtöffnung unnötig riskieren. Der Flansch bleibt deshalb in X
+  exakt auf Körperbreite.
+- _Nur den Checker toleranter stellen_: hätte die reale Haken-Einfädelung
+  nicht verbessert. Die höhere, weiterhin flache Tasche ist die robustere
+  geometrische Lösung.
+- _OCCT-STL direkt mit `pymeshfix.clean()` reparieren_: beim breiteren Trog
+  destruktiv; die Reparatur hätte ~24 % Volumen entfernt. STEP→Gmsh liefert
+  die bessere Ausgangstopologie.

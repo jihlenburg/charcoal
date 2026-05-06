@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rigid assembly-contact model for lid vs. trough, version 1.1.0.
+"""Rigid assembly-contact model for lid vs. trough, version 1.1.5.
 
 Scope:
 - full lid mesh against full trough mesh
@@ -20,6 +20,7 @@ import math
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import trimesh
@@ -28,15 +29,23 @@ from trimesh.proximity import signed_distance
 
 @dataclass(frozen=True)
 class Geometry:
-    version: str = "1.1.0"
-    size_x: float = 62.0
+    version: str = "1.1.5"
+    size_x: float = 65.0
     size_y: float = 93.0
     size_z: float = 40.0
     wall: float = 2.2
     lid_thk: float = 2.5
-    hook_rail_capture: float = 0.6
+    hook_rail_capture: float = 1.1
+    hook_rail_depth: float = 2.1
+    hook_nose_outboard: float = 0.35
     hook_rail_drop: float = 3.0
     hook_rail_nose_height: float = 0.9
+    hook_tip_cham: float = 0.2
+    hook_slot_depth: float = 1.35
+    hook_slot_lead_depth: float = 0.55
+    hook_slot_floor_clearance: float = 0.4
+    hook_slot_roof_clearance: float = 0.35
+    hook_protr: float = 1.1
     retainer_y_offset: float = 18.0
 
     @property
@@ -67,6 +76,38 @@ class Geometry:
             ],
             dtype=float,
         )
+
+    @property
+    def hook_nose_bottom_z(self) -> float:
+        return self.arm_top_z - self.hook_rail_drop
+
+    @property
+    def hook_nose_top_z(self) -> float:
+        return self.hook_nose_bottom_z + self.hook_rail_nose_height
+
+    @property
+    def hook_slot_bottom_z(self) -> float:
+        return self.hook_nose_bottom_z - self.hook_slot_floor_clearance
+
+    @property
+    def hook_slot_roof_z(self) -> float:
+        return self.hook_nose_top_z + self.hook_slot_roof_clearance
+
+    @property
+    def hook_slot_full_h(self) -> float:
+        return self.hook_slot_roof_z - self.hook_slot_bottom_z
+
+    @property
+    def hook_slot_full_center_z(self) -> float:
+        return (self.hook_slot_roof_z + self.hook_slot_bottom_z) / 2.0
+
+    @property
+    def hook_slot_lead_h(self) -> float:
+        return self.arm_top_z - self.hook_slot_roof_z
+
+    @property
+    def hook_slot_lead_center_z(self) -> float:
+        return (self.arm_top_z + self.hook_slot_roof_z) / 2.0
 
 
 @dataclass(frozen=True)
@@ -489,14 +530,16 @@ def json_ready(result: AssemblyResult) -> dict[str, object]:
             return [convert(v) for v in value]
         return value
 
-    return convert(asdict(result))
+    return cast(dict[str, object], convert(asdict(result)))
 
 
 def main() -> int:
     args = parse_args()
+    print("Loading lid/trough meshes...", flush=True)
     lid_mesh = trimesh.load_mesh(args.lid, force="mesh")
     trough_mesh = trimesh.load_mesh(args.trough, force="mesh")
     geom = Geometry()
+    print("Running signed-distance assembly contact search...", flush=True)
     result = analyze(
         lid_mesh=lid_mesh,
         trough_mesh=trough_mesh,

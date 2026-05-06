@@ -1,0 +1,4 @@
+# Optional STL repair dependency used by carbon_filter_build123d.py.
+# Kept separate so the normal CAD/FEM environment is not blocked by
+# pymeshfix/VTK installation issues.
+pymeshfix

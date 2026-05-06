@@ -5,7 +5,7 @@
 - [ ] `trough.stl` (geheilt) erneut beim Bureau hochladen und DFM-Check
       verifizieren (erwartet: 0 non-manifold, 0 Randkanten,
       0 Selbstdurchdringungen)
-- [ ] Viewer-/Druckmuster-Recheck `v1.1.0`: fluchten die zwei +X-Slots mit den
+- [ ] Viewer-/Druckmuster-Recheck `v1.1.5`: fluchten die zwei +X-Slots mit den
       Schnappern, und sitzt die einfache -X-Hakenleiste sauber in ihrer Tasche?
 - [ ] Fingergriff: reicht der 10 mm Y-Flanschüberstand, um die Kassette
       gegen den Sog der Absaugung zu ziehen? Prüfung nach Druckmuster.
@@ -18,7 +18,7 @@
       auf Spalt ~3.5 mm zwischen Körper und harter Schachtwand abstimmen)
 - [ ] Öffnungsbedienung am Druckmuster prüfen: reicht die mittige
       Ein-Finger-Hebebewegung an der Zuglippe? Lösen beide Schnapper sauber
-      über die Auslöserampe? 0.50-mm-Lippen und 1.2-mm-Zuglippe MJF-sauber
+      über die Auslöserampe? 1.1-mm-Lippen und 1.2-mm-Zuglippe MJF-sauber
       gedruckt?
 - [ ] Passive Seite am Druckmuster prüfen: bleibt der -X-Haken beim Öffnen
       definiert eingehakt und klappt der Deckel tatsächlich um diese Seite
@@ -30,7 +30,7 @@
       im Soll (MJF-Verzug)?
 - [ ] Druckorientierung mit Bureau abstimmen (Snap-Arme parallel zu
       Schichten, Flansch möglichst plan)
-- [ ] FE-Abschätzung am Druckmuster plausibilisieren: subjektiv ~7–9 N
+- [ ] FE-Abschätzung am Druckmuster plausibilisieren: subjektiv ~8–11 N
       Gesamt-Hebekraft? Wiederholtes Öffnen ohne Whitening/Rissbildung?
 - [ ] Lüfter-Specs (Modell, Volumenstrom, Statikdruck) erfassen, um
       `size_z` ggf. nachzujustieren
@@ -41,7 +41,7 @@
 - [ ] Deckel-DFM am Druckmuster: Eckenfillet 1.0 mm, Oberkanten-Chamfer 0.5 mm,
       Unterkanten-Chamfer 0.2 mm / Zuglippen-Chamfer 0.4 mm haptisch ok?
       Stören die lokal scharfen Restkanten (OCCT-Limitation) beim Einsetzen?
-- [ ] Optional v1.1.0: Flansch-Eckenschelfs durch Redesign (Flansch mit
+- [ ] Optional v1.1.5: Flansch-Eckenschelfs durch Redesign (Flansch mit
       eigenen Ecken-Fillets) auflösen — nur falls das Druckmuster tatsächlich
       stört
 - [ ] Lesbarkeit der Versionsgravur am Druckmuster prüfen — Font-Size 5 mm,
@@ -52,6 +52,58 @@
 _(leer)_
 
 ## Erledigt
+
+- [x] Automatische Pip-/Venv-Umgebung ergänzt (2026-05-06):
+      - `run` legt `.venv/` an und aktualisiert Abhängigkeiten aus
+        `requirements.txt` nur bei Manifest-Änderung
+      - Wrapper-Kommandos für CAD, lokale FEM, Baugruppenprüfung und
+        Montagezeichnungen ergänzt
+      - `pymeshfix` als optionale Heal-Abhängigkeit nach
+        `requirements-heal.txt` ausgelagert
+
+- [x] Aktive Schnapper moderat straffer gemacht (2026-05-06):
+      - Version/Gravur auf `v1.1.3` angehoben
+      - `hook_protr` 1.0 → 1.1 mm
+      - lokale FEM: nominell ~10.3 N laterale Auslenkkraft pro Schnapper,
+        ~10.4 N Gesamt-Hebekraft, FE-Band ~8.0–10.6 N
+      - maximale Hauptdehnung ~3.4 %, weiterhin im PA12-`1/3`-Proxyband mit
+        kleiner Reserve
+      - Baugruppen-Checker bleibt kollisionsfrei; harte Restpenetration
+        weiterhin 0 Punkte
+
+- [x] Trogseitige Haken-Retentionslippe ergänzt (2026-05-06):
+      - Version/Gravur auf `v1.1.5` angehoben
+      - Haken-Tasche zweistufig: 1.35 mm tiefe Retentionstasche unten,
+        0.55 mm tiefer Einführkanal oben
+      - dadurch bleibt eine 0.80 mm tiefe Materiallippe in der Trogwand,
+        unter der die Haken-Nase sichtbar trägt
+      - äußerste Haken-Nase mit 0.2-mm-Fase entschärft
+      - lokale Hook-FEM: PA12-`1/3`-Proxy-Haltekraft ~174–213 N
+      - Baugruppen-Checker bleibt kollisionsfrei; harte Restpenetration
+        weiterhin 0 Punkte
+
+- [x] Passive Hakenleiste verstärkt und Haltekraft geprüft (2026-05-06):
+      - Version/Gravur auf `v1.1.4` angehoben
+      - realer Untergriff hinter der Trog-Innenwand 0.70 → 1.05 mm
+      - Haken-Nase 0.35 mm über die Deckelkante nach außen gezogen
+      - oberer Hakensteg 0.40 → 1.00 mm, Querschnitt 34 mm²
+      - neuer Solver `fem/hook_hold_fem.py`
+      - lokale Hook-FEM: PA12-`1/3`-Proxy-Haltekraft ~103–125 N
+      - Baugruppen-Checker bleibt kollisionsfrei; harte Restpenetration
+        weiterhin 0 Punkte
+
+- [x] Breite nach Druckmuster-Fit auf 65 mm erhöht, Hook verstärkt und
+      STEP-remesh-STLs ergänzt (2026-05-06):
+      - `size_x` 62 → 65 mm, Flansch-Footprint jetzt 65 × 113 × 2.2 mm
+      - Version/Gravur auf `v1.1.2` angehoben
+      - passive Haken-Überdeckung 0.6 → 1.1 mm
+      - passive Haken-Tasche auf 3.4 mm Höhe erweitert, damit der
+        Hook-first-Checker mit der breiteren Baugruppe wieder kollisionsfrei
+        bleibt
+      - STL-Export auf STEP→Gmsh-Remesh plus `pymeshfix` umgestellt;
+        `trough.stl` und `lid.stl` sind jetzt beide watertight mit 0
+        gemeldeten Selbstdurchdringungen
+      - STEP/STL und Montage-SVGs neu erzeugt
 
 - [x] Release `v1.1.0` vorbereitet (2026-04-19):
       - asymmetrische Deckelverriegelung `1 einfache Hakenleiste + 2 Schnapper`

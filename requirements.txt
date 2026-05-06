@@ -1,0 +1,11 @@
+# Core CAD/viewer workflow
+build123d
+ocp-vscode
+
+# FEM and mesh-analysis workflow
+gmsh
+meshio
+numpy
+scikit-fem
+trimesh
+rtree

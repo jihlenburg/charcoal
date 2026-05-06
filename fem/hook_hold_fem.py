@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Local retention check for the passive v1.1.6 hook rail.
 
 This model is intentionally focused:

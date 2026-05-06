@@ -54,6 +54,8 @@ Viewer:
 Save the file to live-reload the viewer. Exports STEP + STL alongside.
 """
 
+# SPDX-License-Identifier: CERN-OHL-S-2.0 OR AGPL-3.0-or-later
+
 import math
 from pathlib import Path
 

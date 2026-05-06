@@ -605,6 +605,24 @@ der Effekt ist in Grenzfällen messbar.
 Gehäuse hat keine geschlossenen Taschen. Pulver rieselt frei durch die Kassette
 und durch die Snap-Schlitze.
 
+## Lizenz
+
+Das Projekt nutzt bewusst eine geteilte Lizenz:
+
+- **Hardware-Design, CAD-/STEP-/STL-/SVG-Ausgaben, FEM-Ausgaben und
+  Designdokumentation**: CERN Open Hardware Licence Version 2 - Strongly
+  Reciprocal (`CERN-OHL-S-2.0`)
+- **Software-Scripte und Tooling**: GNU Affero General Public License v3.0
+  or later (`AGPL-3.0-or-later`)
+
+`carbon_filter_build123d.py` ist sowohl parametrische CAD-Quelle des
+physischen Produkts als auch ausführbares Python-Script. Es ist deshalb als
+Hardware-Design-Source unter `CERN-OHL-S-2.0` lizenziert und, soweit es als
+Software behandelt wird, zusätzlich unter `AGPL-3.0-or-later`.
+
+Der kurze Lizenzhinweis steht in `LICENSE`, die vollständigen Lizenztexte in
+`LICENSES/CERN-OHL-S-2.0.txt` und `LICENSES/AGPL-3.0-or-later.txt`.
+
 ## Parameter im Script
 
 Alle Masse stehen als benannte Variablen am Dateianfang und sind über
@@ -615,6 +633,8 @@ Script re-exportiert STEP/STL.
 
 - `run` — legt `.venv/` automatisch an, installiert Pip-Abhängigkeiten und
   startet CAD-/FEM-/Zeichnungs-Kommandos
+- `LICENSE` — kurzer Projekt-Lizenzhinweis mit Scope-Aufteilung
+- `LICENSES/` — vollständige Lizenztexte für CERN-OHL-S-2.0 und AGPL-3.0-or-later
 - `requirements.txt` — Kernabhängigkeiten für CAD, Viewer, FEM und
   Baugruppenprüfung
 - `requirements-heal.txt` — optionale STL-Heal-Abhängigkeit `pymeshfix`

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Linear-elastic trough wall bulge check for charcoal packing pressure.
 
 This is a focused design check, not a granular-material simulation:

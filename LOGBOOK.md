@@ -4,6 +4,24 @@ Chronologisches Protokoll der Design- und Toolchain-Entscheidungen.
 
 ## 2026-05-07
 
+### Lizenzierung auf Hardware/Software-Split umgestellt
+
+Der initiale GitHub-`LICENSE`-Stand war AGPLv3. Das ist für die Python-Tools
+vertretbar, aber für CAD-/STEP-/STL-Dateien und daraus gedruckte Produkte
+missverständlich. Das Repo wurde deshalb auf eine explizite Scope-Aufteilung
+umgestellt:
+
+- Hardware-Design-Source, generierte CAD-/Print-/FEM-Artefakte und
+  Designdokumentation: `CERN-OHL-S-2.0`
+- Software-Scripte und Tooling: `AGPL-3.0-or-later`
+- `carbon_filter_build123d.py`: Hardware-Design-Source unter
+  `CERN-OHL-S-2.0`; soweit als Software behandelt zusätzlich
+  `AGPL-3.0-or-later`
+
+Die vollständigen Lizenztexte liegen unter `LICENSES/`; der Root-`LICENSE`
+ist jetzt ein kurzer Projekt-Lizenzhinweis mit Scope-Abgrenzung. Die
+Python-/Shell-Scripte tragen SPDX-Identifier.
+
 ### Body auf 95 mm, Hexgrid erweitert und Anti-Bauch-Bars ergänzt, Release-Kandidat v1.1.6
 
 Nach Rückmeldung vom Druckmuster wurde die verfügbare Schachthöhe besser

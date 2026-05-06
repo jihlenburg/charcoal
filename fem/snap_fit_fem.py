@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Local linear-elastic FEM for the v1.1.6 snap tab.
 
 This is intentionally a focused Phase-1 model:

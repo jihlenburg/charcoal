@@ -5,8 +5,9 @@
 - [ ] `trough.stl` (geheilt) erneut beim Bureau hochladen und DFM-Check
       verifizieren (erwartet: 0 non-manifold, 0 Randkanten,
       0 Selbstdurchdringungen)
-- [ ] Viewer-/Druckmuster-Recheck `v1.1.5`: fluchten die zwei +X-Slots mit den
-      Schnappern, und sitzt die einfache -X-Hakenleiste sauber in ihrer Tasche?
+- [ ] Viewer-/Druckmuster-Recheck `v1.1.6`: fluchten die zwei +X-Slots mit den
+      Schnappern, sitzt die einfache -X-Hakenleiste sauber in ihrer Tasche,
+      und sind die internen Anti-Bauch-Bars beim Befüllen nicht störend?
 - [ ] Fingergriff: reicht der 10 mm Y-Flanschüberstand, um die Kassette
       gegen den Sog der Absaugung zu ziehen? Prüfung nach Druckmuster.
 - [ ] Armwurzel-Fillet visuell prüfen — Kanten-Selektor ist bbox-gefiltert,
@@ -15,7 +16,7 @@
       ohne Anstehen durch die 70 mm Hartöffnung? Kassette steht die
       erwarteten 2.2 mm aus dem Schacht?
 - [ ] Moosgummistreifen auf Y-Flächen des Körpers auswählen (Materialstärke
-      auf Spalt ~3.5 mm zwischen Körper und harter Schachtwand abstimmen)
+      auf Spalt ~2.5 mm zwischen Körper und harter Schachtwand abstimmen)
 - [ ] Öffnungsbedienung am Druckmuster prüfen: reicht die mittige
       Ein-Finger-Hebebewegung an der Zuglippe? Lösen beide Schnapper sauber
       über die Auslöserampe? 1.1-mm-Lippen und 1.2-mm-Zuglippe MJF-sauber
@@ -23,9 +24,15 @@
 - [ ] Passive Seite am Druckmuster prüfen: bleibt der -X-Haken beim Öffnen
       definiert eingehakt und klappt der Deckel tatsächlich um diese Seite
       auf? Reicht die kleine Verschiebebewegung zum kompletten Aushängen?
-- [ ] Hook-first-Montage am Druckmuster plausibilisieren: greifen die neuen
-      passiven Eckfreistiche praktisch wie im Baugruppen-Checker, und lässt
-      sich der Deckel tatsächlich erst einhängen und dann herunterkippen?
+- [ ] Hook-first-Montage am Druckmuster plausibilisieren: lässt sich der
+      Deckel ohne die alten passiven Eckfreistiche tatsächlich erst einhängen
+      und dann herunterkippen?
+- [ ] Top-Vlies am Druckmuster prüfen: passt das 3-mm-Filtervlies zwischen
+      Anti-Bauch-Bars und Deckelunterseite in den 4.0-mm-Nominalspalt, ohne
+      die Schnapper oder den Haken zu blockieren?
+- [ ] Befülltest mit Granulat: bleiben die langen X-Wände durch die drei
+      internen Bars sichtbar gerader, und hängen Pellets/Vlies nicht
+      störend an den Bars?
 - [ ] Maßprüfung nach Druck: Deckel-Spiel 0.30 mm in Ordnung? Hex-Lochweite
       im Soll (MJF-Verzug)?
 - [ ] Druckorientierung mit Bureau abstimmen (Snap-Arme parallel zu
@@ -41,7 +48,7 @@
 - [ ] Deckel-DFM am Druckmuster: Eckenfillet 1.0 mm, Oberkanten-Chamfer 0.5 mm,
       Unterkanten-Chamfer 0.2 mm / Zuglippen-Chamfer 0.4 mm haptisch ok?
       Stören die lokal scharfen Restkanten (OCCT-Limitation) beim Einsetzen?
-- [ ] Optional v1.1.5: Flansch-Eckenschelfs durch Redesign (Flansch mit
+- [ ] Optional v1.1.6: Flansch-Eckenschelfs durch Redesign (Flansch mit
       eigenen Ecken-Fillets) auflösen — nur falls das Druckmuster tatsächlich
       stört
 - [ ] Lesbarkeit der Versionsgravur am Druckmuster prüfen — Font-Size 5 mm,
@@ -52,6 +59,21 @@
 _(leer)_
 
 ## Erledigt
+
+- [x] Release-Kandidat `v1.1.6` auf 95 mm Höhe, mehr Hex-Öffnungen und
+      interne Anti-Bauch-Bars gebracht (2026-05-07):
+      - `size_y` 93 → 95 mm, Flansch-Footprint jetzt 65 × 115 × 2.2 mm
+      - Hex-Pattern 28 → 36 Löcher pro Seite durch `hex_margin_x` 4.0 → 2.8 mm
+      - passive Deckel-Eckfreistiche entfernt; die sichtbare Diagonalkante auf
+        den Druckteilen entfällt
+      - drei interne Querbars bei `Y = -36, 0, +36 mm`, je 2.2 × 1.4 mm,
+        mit 4.0 mm Nominalspalt zur Deckelunterseite für 3-mm-Obervlies
+      - neuer Solver `fem/trough_bulge_fem.py` mit JSON, VTK und Heatmaps
+      - Bulge-FEM bei 5 kPa: max. Ausbuchtung 0.083 → 0.023 mm, Druck für
+        1.0 mm Ausbuchtung 60.5 → 217.8 kPa
+      - Baugruppen-Checker bleibt kollisionsfrei; Hook-first-Montagepfad
+        weiterhin plausibel
+      - STEP/STL neu erzeugt; Trog und Deckel watertight und winding-consistent
 
 - [x] Automatische Pip-/Venv-Umgebung ergänzt (2026-05-06):
       - `run` legt `.venv/` an und aktualisiert Abhängigkeiten aus

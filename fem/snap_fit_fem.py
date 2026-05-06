@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Local linear-elastic FEM for the v1.1.5 snap tab.
+"""Local linear-elastic FEM for the v1.1.6 snap tab.
 
 This is intentionally a focused Phase-1 model:
 
 - one active snap tab only
-- current v1.1.5 nose geometry
+- current v1.1.6 nose geometry
 - 3D tetra mesh generated with Gmsh
 - solved with scikit-fem as small-strain linear elasticity
 - load applied on the real catch face, not at the absolute tip
@@ -53,7 +53,7 @@ except ImportError as exc:  # pragma: no cover - dependency guard
 
 @dataclass(frozen=True)
 class SnapGeometry:
-    version: str = "1.1.5"
+    version: str = "1.1.6"
     hook_width: float = 6.0
     hook_arm: float = 1.0
     hook_length: float = 10.2
@@ -118,7 +118,7 @@ class FemResult:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Local FEM for the v1.1.5 PA12 snap tab."
+        description="Local FEM for the v1.1.6 PA12 snap tab."
     )
     parser.add_argument(
         "--mesh-size",
@@ -474,7 +474,7 @@ def print_report(result: FemResult) -> None:
     print(
         "Note:                     This model resolves the real catch face and "
         "is therefore more conservative than the simple cantilever formula. "
-        "The actual v1.1.5 arm-root fillet is not modeled explicitly here."
+        "The actual v1.1.6 arm-root fillet is not modeled explicitly here."
     )
 
 

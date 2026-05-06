@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local retention check for the passive v1.1.5 hook rail.
+"""Local retention check for the passive v1.1.6 hook rail.
 
 This model is intentionally focused:
 
@@ -53,7 +53,7 @@ except ImportError as exc:  # pragma: no cover - dependency guard
 
 @dataclass(frozen=True)
 class HookGeometry:
-    version: str = "1.1.5"
+    version: str = "1.1.6"
     size_x: float = 65.0
     wall: float = 2.2
     shelf_w: float = 1.0

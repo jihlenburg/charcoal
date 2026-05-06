@@ -14,6 +14,7 @@ Commands:
   cad                Run carbon_filter_build123d.py
   fem-snap           Run fem/snap_fit_fem.py
   fem-hook           Run fem/hook_hold_fem.py
+  fem-bulge          Run fem/trough_bulge_fem.py
   fem-assembly       Run fem/lid_trough_assembly.py
   drawings           Run fem/assembly_sequence_svg.py
   python             Run venv Python with the given args
@@ -160,6 +161,9 @@ case "$cmd" in
         ;;
     fem-hook)
         exec "$VENV_PY" "$ROOT/fem/hook_hold_fem.py" "$@"
+        ;;
+    fem-bulge)
+        exec "$VENV_PY" "$ROOT/fem/trough_bulge_fem.py" "$@"
         ;;
     fem-assembly)
         exec "$VENV_PY" "$ROOT/fem/lid_trough_assembly.py" "$@"

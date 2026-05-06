@@ -87,7 +87,7 @@ set_port(3939)
 # ---------------------------------------------------------------------------
 # Version (engraved onto the +Y flange overhang, apartment-facing side)
 # ---------------------------------------------------------------------------
-VERSION = "1.1.5"
+VERSION = "1.1.6"
 version_font = 5.0       # mm — fits the 10 mm Y-overhang comfortably
 version_depth = 0.6      # mm — recessed engraving; MJF prints this crisp
                          # without weakening the 2.2 mm flange floor
@@ -97,7 +97,7 @@ version_depth = 0.6      # mm — recessed engraving; MJF prints this crisp
 # ---------------------------------------------------------------------------
 # Outer envelope of cassette body
 size_x = 65.0       # shaft width direction (foam contact both sides)
-size_y = 93.0       # shaft vertical direction (hard walls top/bottom)
+size_y = 95.0       # shaft vertical direction (hard walls top/bottom)
 size_z = 40.0       # shaft depth / airflow direction (bed + walls + lid)
 
 # Shell
@@ -123,7 +123,7 @@ fit_clear = 0.30
 # preserves frame stiffness.
 hex_flats = 10.0
 hex_web = 1.2
-hex_margin_x = 4.0
+hex_margin_x = 2.8
 hex_margin_y = 4.0
 
 # Lid retention:
@@ -169,12 +169,21 @@ grip_notch_plane_offset = 1.0
 grip_notch_min_wall = 1.0
 grip_notch_cut = wall + grip_notch_plane_offset - grip_notch_min_wall
 
-# Assembly relief on the passive (-X) side: small plan-view corner cuts at the
-# two passive corners. They are far away from the centered hook rail and keep
-# the rabbet contact almost entirely intact, but remove exactly the corners
-# that otherwise hit the trough during hook-first tilted insertion.
-passive_corner_relief_x = 1.6
-passive_corner_relief_y = 8.0
+# The earlier triangular passive-corner reliefs solved an insertion collision
+# but left a visible diagonal witness line on production parts. The stronger
+# two-depth receiver ledge now keeps hook-first assembly viable without that
+# cosmetic corner cut.
+passive_corner_relief_x = 0.0
+passive_corner_relief_y = 0.0
+
+# Internal anti-spread ties: permanent crossbars inside the trough envelope.
+# FEM showed the free upper rim is the weak mode; these bars tie the two long
+# X walls together near the top without adding anything outside the 65 mm fit.
+# They sit below the passive hook rail and away from the two snap-arm lanes.
+anti_bulge_tie_width_y = 2.2
+anti_bulge_tie_height_z = 1.4
+anti_bulge_tie_lid_gap = 4.0
+anti_bulge_tie_y_offsets = (-36.0, 0.0, 36.0)
 
 # DFM (Design-for-Manufacturability) radii applied after the main solid
 # operations. See README "MJF-Optimierungen" for reasoning per edge.
@@ -237,6 +246,8 @@ hook_slot_lead_center_z = (arm_top_z + hook_slot_roof_z) / 2
 hook_receiver_ledge_depth = hook_slot_depth - hook_slot_lead_depth
 slot_z_min = catch_center_z - slot_h / 2
 slot_z_max = catch_center_z + slot_h / 2
+anti_bulge_tie_top_z = arm_top_z - anti_bulge_tie_lid_gap
+anti_bulge_tie_z0 = anti_bulge_tie_top_z - anti_bulge_tie_height_z
 
 carbon_bed_depth = size_z - floor - lid_thk - 2 * fleece_thk
 effective_hook_capture = lid_x / 2 + hook_nose_outboard - cavity_x / 2
@@ -468,6 +479,18 @@ with BuildPart() as trough_b:
             rabbet_edges.append(e)
     try_fillet(rabbet_edges, rabbet_fil, "rabbet")
 
+    # Permanent internal anti-spread ties. Each bar is fused into both long
+    # X walls, so wall spread puts the bar in tension instead of relying on
+    # contact/friction. They are low enough to clear the passive hook rail.
+    for y in anti_bulge_tie_y_offsets:
+        with Locations((0.0, y, anti_bulge_tie_z0)):
+            Box(
+                cavity_x,
+                anti_bulge_tie_width_y,
+                anti_bulge_tie_height_z,
+                align=(Align.CENTER, Align.CENTER, Align.MIN),
+            )
+
     # Hex perforation on the floor face (Z=0) — cut upward through the
     # floor plate. Hex pattern is sized to the cavity interior so no
     # holes fall under the walls or the flange.
@@ -583,26 +606,24 @@ with BuildPart() as lid_b:
             Rectangle(grip_lip_extend, grip_lip_width)
     extrude(amount=lid_thk)
 
-    # Small plan-view corner reliefs on the passive hook side. These are not
-    # part of the sealing/retention path; they only free the two -X corners so
-    # the lid can be offered into the trough at a slight tilt without the
-    # passive corner digging into the rabbet/top-wall geometry first.
-    with BuildSketch(Plane.XY.offset(size_z - lid_thk)) as _:
-        with BuildLine() as _bl:
-            Polyline(
-                (-lid_x / 2, -lid_y / 2),
-                (-lid_x / 2 + passive_corner_relief_x, -lid_y / 2),
-                (-lid_x / 2, -lid_y / 2 + passive_corner_relief_y),
-                close=True,
-            )
-            Polyline(
-                (-lid_x / 2, lid_y / 2),
-                (-lid_x / 2 + passive_corner_relief_x, lid_y / 2),
-                (-lid_x / 2, lid_y / 2 - passive_corner_relief_y),
-                close=True,
-            )
-        make_face()
-    extrude(amount=lid_thk, mode=Mode.SUBTRACT)
+    if passive_corner_relief_x > 0.0 and passive_corner_relief_y > 0.0:
+        # Optional plan-view corner reliefs on the passive hook side.
+        with BuildSketch(Plane.XY.offset(size_z - lid_thk)) as _:
+            with BuildLine() as _bl:
+                Polyline(
+                    (-lid_x / 2, -lid_y / 2),
+                    (-lid_x / 2 + passive_corner_relief_x, -lid_y / 2),
+                    (-lid_x / 2, -lid_y / 2 + passive_corner_relief_y),
+                    close=True,
+                )
+                Polyline(
+                    (-lid_x / 2, lid_y / 2),
+                    (-lid_x / 2 + passive_corner_relief_x, lid_y / 2),
+                    (-lid_x / 2, lid_y / 2 - passive_corner_relief_y),
+                    close=True,
+                )
+            make_face()
+        extrude(amount=lid_thk, mode=Mode.SUBTRACT)
 
     # Hex perforation on the lid — same pattern as floor for straight flow
     with BuildSketch(Plane.XY.offset(size_z - lid_thk - 1.0)) as _:
@@ -767,6 +788,11 @@ print(f"Carbon bed depth:         {carbon_bed_depth:.1f} mm "
       f"(= Z − floor − lid − 2×{fleece_thk} fleece)")
 print(f"Wall thickness:           {wall:.2f} mm")
 print(f"Residual wall at rabbet:  {residual_wall:.2f} mm")
+print(f"Anti-spread ties:         {len(anti_bulge_tie_y_offsets)} bars, "
+      f"{anti_bulge_tie_width_y:.1f}×{anti_bulge_tie_height_z:.1f} mm "
+      f"at Z={anti_bulge_tie_z0:.1f}…{anti_bulge_tie_top_z:.1f}")
+print(f"Tie-to-lid fleece gap:    {arm_top_z - anti_bulge_tie_top_z:.1f} mm "
+      f"(for {fleece_thk:.1f} mm top fleece)")
 print(f"Lid clearance per side:   {fit_clear:.2f} mm")
 print(f"Hex holes (per face):     {len(hex_pattern)}")
 print(f"Snap arm max strain:      {strain*100:.2f} %")
@@ -826,7 +852,13 @@ def _mesh_volume_cm3(v, f) -> float:
     ) / 1000
 
 
-def _remesh_stl_from_step(step_path: Path, stl_path: Path, ref_volume_cm3: float) -> None:
+def _remesh_stl_from_step(
+    step_path: Path,
+    stl_path: Path,
+    ref_volume_cm3: float,
+    mesh_size_min: float = 0.2,
+    mesh_size_max: float = 0.8,
+) -> None:
     """Re-mesh a STEP BRep with Gmsh and replace the STL if validation passes.
 
     OCCT's direct STL tessellation can leave tiny open seams at tangent
@@ -849,8 +881,8 @@ def _remesh_stl_from_step(step_path: Path, stl_path: Path, ref_volume_cm3: float
         try:
             gmsh.option.setNumber("General.Terminal", 0)
             gmsh.open(str(step_path))
-            gmsh.option.setNumber("Mesh.MeshSizeMin", 0.2)
-            gmsh.option.setNumber("Mesh.MeshSizeMax", 0.8)
+            gmsh.option.setNumber("Mesh.MeshSizeMin", mesh_size_min)
+            gmsh.option.setNumber("Mesh.MeshSizeMax", mesh_size_max)
             gmsh.option.setNumber("Mesh.StlOneSolidPerSurface", 0)
             gmsh.model.mesh.generate(2)
             gmsh.write(str(candidate))
@@ -954,6 +986,8 @@ _remesh_stl_from_step(
     step_dir / "lid.step",
     stl_dir / "lid.stl",
     lid.volume / 1000,
+    mesh_size_min=0.4,
+    mesh_size_max=1.0,
 )
 print("Mesh heal:")
 _heal_stl(stl_dir / "trough.stl")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rigid assembly-contact model for lid vs. trough, version 1.1.5.
+"""Rigid assembly-contact model for lid vs. trough, version 1.1.6.
 
 Scope:
 - full lid mesh against full trough mesh
@@ -29,9 +29,9 @@ from trimesh.proximity import signed_distance
 
 @dataclass(frozen=True)
 class Geometry:
-    version: str = "1.1.5"
+    version: str = "1.1.6"
     size_x: float = 65.0
-    size_y: float = 93.0
+    size_y: float = 95.0
     size_z: float = 40.0
     wall: float = 2.2
     lid_thk: float = 2.5
@@ -46,6 +46,8 @@ class Geometry:
     hook_slot_floor_clearance: float = 0.4
     hook_slot_roof_clearance: float = 0.35
     hook_protr: float = 1.1
+    passive_corner_relief_x: float = 0.0
+    passive_corner_relief_y: float = 0.0
     retainer_y_offset: float = 18.0
 
     @property

@@ -2,6 +2,65 @@
 
 Chronologisches Protokoll der Design- und Toolchain-Entscheidungen.
 
+## 2026-05-07
+
+### Body auf 95 mm, Hexgrid erweitert und Anti-Bauch-Bars ergänzt, Release-Kandidat v1.1.6
+
+Nach Rückmeldung vom Druckmuster wurde die verfügbare Schachthöhe besser
+genutzt und gleichzeitig die beim Befüllen beobachtete Bauchung der langen
+Trogwände adressiert. Außen darf wegen des engen Lüftungsschachts nichts
+auftragen; daher wurde keine äußere Klammer oder Collar-Lösung übernommen.
+
+Geometrieänderungen:
+
+- `VERSION = "1.1.6"`
+- `size_y` 93 → 95 mm
+- Flansch-Footprint jetzt `65 × 115 × 2.2 mm`
+- Hex-Pattern durch `hex_margin_x` 4.0 → 2.8 mm auf 36 Löcher pro Fläche
+  erweitert
+- passive `-X`-Deckel-Eckfreistiche entfernt, weil sie auf den Druckteilen
+  eine sichtbare Diagonalkante erzeugten
+- drei interne Anti-Bauch-Bars bei `Y = -36, 0, +36 mm`
+- Bars: `2.2 mm` breit in Y, `1.4 mm` hoch in Z, quer über die Kavität
+- Bar-Lage `Z = 32.1 … 33.5 mm`; zur Deckelunterseite bei `Z = 37.5 mm`
+  bleiben `4.0 mm` Nominalspalt für das obere 3-mm-Filtervlies
+
+Neue Analyse:
+
+- neuer Solver `fem/trough_bulge_fem.py`
+- vereinfachtes lineares PA12-Solidmodell des Trogs
+- gleichförmiger seitlicher Granulatdruck auf die langen X-Innenwände
+- Vergleich Plain-Trog gegen aktuellen Trog mit internen Bars
+- optionale Ausgaben: JSON, ParaView-`vtu`, PNG/SVG-Heatmaps
+
+Validierung:
+
+- `./run --with-heal cad`: STEP/STL neu erzeugt, Viewer aktualisiert
+- CAD-Ausgabe: Körper `65 × 95 × 40 mm`, Flansch `65 × 115 × 2.2 mm`,
+  36 Hex-Löcher pro Fläche, Trogvolumen `34.89 cm³`, Deckelvolumen
+  `6.76 cm³`
+- STEP→Gmsh→pymeshfix: `trough.stl` wasserdicht und winding-consistent,
+  Selbstdurchdringungen `13 → 0`, Volumen praktisch unverändert
+- `lid.stl`: wasserdicht und winding-consistent, bereits clean
+- `./run fem-bulge --pressure-kpa 5 --variant both --support open`:
+  Plain-Trog `0.083 mm` max. Ausbuchtung, aktueller Trog `0.023 mm`;
+  Druck für `1.0 mm` Ausbuchtung `60.5 → 217.8 kPa`
+- `./run fem-assembly`: Hook-first-Pfad weiterhin plausibel,
+  beste Lage `-10°`, `dx = +0.40 mm`, `dz = +1.20 mm`,
+  harte Restpenetration 0 Punkte, Schnapper-Interferenz `~0.94 mm`
+- `./run fem-snap`: nominale Gesamt-Hebekraft `~10.39 N`
+- `./run fem-hook`: passive Hakenleiste bleibt strukturell deutlich über
+  dem erwarteten Nutzlastbereich (`~174 … 213 N` im PA12-`1/3`-Proxy)
+
+Entscheidung:
+
+- Keine externen Stützfeatures, weil der Schacht-Fit bereits eng ist.
+- Keine kleinen vertikalen Wandrippen als Hauptlösung: die erste FEM zeigte,
+  dass die freie obere Kante der dominierende Verformungsmodus ist.
+- Interne Querbars sind der aktuelle Kompromiss: sie bleiben innerhalb des
+  Außenmaßes, reduzieren die berechnete Ausbuchtung deutlich und lassen
+  bewusst Platz für das obere Filtervlies.
+
 ## 2026-05-06
 
 ### Trogseitige Haken-Retentionslippe ergänzt, Release v1.1.5

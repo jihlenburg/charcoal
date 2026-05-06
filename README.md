@@ -1,6 +1,6 @@
 # Aktivkohlefilter-Einsatz (Passivlüftung mit aktiven Absaugungen)
 
-**Version: 1.1.5** (im Script als `VERSION`-Konstante; wird als Gravur auf
+**Version: 1.1.6** (im Script als `VERSION`-Konstante; wird als Gravur auf
 den +Y-Flanschüberstand aufgebracht und muss beim Bump synchron mitgeführt
 werden: `carbon_filter_build123d.py` → README → git-Tag).
 
@@ -26,8 +26,10 @@ Z horizontal zur Schachttiefe wird.
    dabei über ihre Auslöserampe selbsttätig aus, während die Hakenleiste auf
    der Gegenseite den Deckel in ihrer Tasche hält und die Öffnungsseite definiert
 2. Filtervlies auf den Boden legen (3 mm, dichtet Hex gegen Granulatdurchfall)
-3. Aktivkohlegranulat einfüllen (~29 mm Schüttung, ~71 g bei 450 kg/m³)
-4. Zweites Filtervlies obenauf
+3. Aktivkohlegranulat einfüllen (~29 mm Schüttung, ~72 g bei 450 kg/m³)
+4. Zweites Filtervlies obenauf; die internen Anti-Bauch-Bars liegen 4.0 mm
+   unter der Deckelunterseite, sodass ein 3-mm-Vlies mit ca. 1 mm Reserve
+   zwischen Bars und Deckel passt
 5. Deckel erst mit der Hakenleiste in die Gegentasche einsetzen, dann die
    Schnapper-Seite herunterdrücken bis beide Nasen hörbar einrasten
 
@@ -47,7 +49,7 @@ eingeschoben, der **Boden zeigt nach vorne** in die Wohnung. Gründe:
 - Der Flansch am Boden fungiert als **Einschub-Stopper und Fingergriff**.
   Er ragt **nur in Y-Richtung** (vertikal im Schacht) über den Körper
   hinaus — in X bleibt er auf Körperbreite, weil die harte Schachtbreite
-  70 mm nicht überschritten werden darf. Flansch-Footprint: 65 × 113 mm vs.
+  70 mm nicht überschritten werden darf. Flansch-Footprint: 65 × 115 mm vs.
   Schacht-Hartöffnung 70 × 100 mm — die je 10 mm-Überstände oben und unten
   fangen an der Schacht-Frontkante und geben gleichzeitig bequem Platz für
   Daumen/Zeigefinger. Die Kassette steht damit `floor = 2.2 mm` aus der
@@ -69,18 +71,24 @@ Schaum.
 ## Geometrie
 
 - Zwei Teile: Grundkörper (Trog mit integriertem Flansch + Boden) und Deckel
-- Körper-Aussenmasse: **65 (X) × 93 (Y) × 40 (Z)** mm
-- Bodenflansch: **65 × 113 × 2.2** mm (Z = 0 … 2.2) — nur in Y breiter als Körper
+- Körper-Aussenmasse: **65 (X) × 95 (Y) × 40 (Z)** mm
+- Bodenflansch: **65 × 115 × 2.2** mm (Z = 0 … 2.2) — nur in Y breiter als Körper
   (je 10 mm Überstand oben und unten als Stopper + Fingergriff)
 - Wand 2.2 mm, Boden 2.2 mm, Deckel 2.5 mm
 - Hex-Perforation identisch auf **Boden** und **Deckel** (Z-Flächen):
-  10 mm flat-to-flat, 1.2 mm Stegbreite, 4 mm Randabstand → 28 Löcher pro
-  Fläche, ~45 % Offenfläche (24 cm² auf 54 cm² Kavität)
+  10 mm flat-to-flat, 1.2 mm Stegbreite, 2.8 mm X-Randabstand und 4.0 mm
+  Y-Randabstand → 36 Löcher pro Fläche, ~57 % Offenfläche
+  (~31 cm² auf ~55 cm² Kavität)
 - Rabbet-Sitz am oberen Rand, 1.0 mm Schulter, 2.5 mm tief
 - Passungsspiel 0.30 mm pro Seite (MJF-Standard)
 - Kein Fingerausschnitt am Boden — die 10 mm Y-Flansch-Überstände oben und
   unten dienen als Fingergriff (Daumen oben, Zeigefinger unten, ziehen)
 - Aktivkohlebett-Tiefe: **29.3 mm** (= Z − Boden − Deckel − 2 × 3 mm Filtervlies)
+- Drei interne Anti-Bauch-Bars verbinden die langen X-Wände bei
+  `Y = -36, 0, +36 mm`. Je Bar: **2.2 mm** breit in Y, **1.4 mm** hoch in Z,
+  quer über die Kavität. Lage: **Z = 32.1 … 33.5 mm**, damit zur
+  Deckelunterseite bei `Z = 37.5 mm` ein **4.0 mm** Spalt für das obere
+  3-mm-Filtervlies bleibt.
 
 ### Versionsgravur
 
@@ -115,10 +123,10 @@ Release).
   **0.80 mm** tiefe Material-Lippe, unter der die Haken-Nase sichtbar trägt.
   Außen bleiben etwa **0.30 mm** Taschenluft. Die äußerste Haken-Nase ist mit
   einer 0.2-mm-Fase entschärft.
-- Passive Montagefreistiche: an den beiden `-X`-Deckelecken ist in der
-  Draufsicht je ein kleiner Eckfreistich (`1.6 × 8.0 mm`) ausgespart. Diese
-  Entlastung sitzt bewusst **außerhalb** der mittigen Hakenleiste und dient
-  nur dazu, die Hook-first-Kippmontage kollisionsfrei zu machen.
+- Keine passiven Eckfreistiche mehr: die `v1.1.0`-Reliefs haben auf den
+  Druckteilen eine sichtbare Diagonalkante erzeugt. `v1.1.6` entfernt diese
+  kosmetische Störkante wieder; die zweistufige Haken-Tasche bleibt im
+  Baugruppen-Checker trotzdem kollisionsfrei.
 - Rastnasen: 6 mm breit, 10.2 mm lang, 1.0 mm Armdicke, 1.1 mm
   Lippenüberstand, 1.5 mm Einführschräge, 0.4 mm Haltelänge, 2.8 mm
   Auslöserampe, 0.5 mm Armwurzel-Fillet.
@@ -216,7 +224,7 @@ vorige kurze 7-mm-Geometrie.
 Zusätzlich zur schnellen Balkenabschätzung gibt es jetzt eine lokale
 3D-FE-Analyse in `fem/snap_fit_fem.py`.
 Das Modell bildet **einen aktiven Schnapper** mit der aktuellen
-`v1.1.5`-Nasenform ab, belastet die reale Rastfläche mit `1 N` in `+X` und
+`v1.1.6`-Nasenform ab, belastet die reale Rastfläche mit `1 N` in `+X` und
 skaliert die Antwort dann auf die nötige Öffnungs-Auslenkung
 `hook_protr + fit_clear = 1.40 mm`.
 
@@ -250,7 +258,7 @@ Modell belastet den unteren Haken-Nasenbereich mit `1 N` nach unten, klemmt
 den oberen Steg als Deckelanschluss und skaliert die lineare Elastizität bis
 zum PA12-`1/3`-Proxyband.
 
-Aktueller Befund für `v1.1.5`:
+Aktueller Befund für `v1.1.6`:
 
 - reale Überdeckung hinter der Trog-Innenwand: **1.05 mm**
 - nötige bewusste `+X`-Verschiebung zum Aushängen: **~1.05 mm**
@@ -269,11 +277,13 @@ sichtbare Retentionslippe in der Trogwand.
 ### Innenaufbau (Luftweg-Richtung: Deckel → Boden)
 
 ```
-Hex-Deckel → 3 mm Filtervlies → Aktivkohlebett (~29 mm) → 3 mm Filtervlies → Hex-Boden
+Hex-Deckel → 3 mm Filtervlies → Anti-Bauch-Bars / Aktivkohlebett (~29 mm) → 3 mm Filtervlies → Hex-Boden
 ```
 
 Das Bett sitzt zwischen zwei Vlieslagen, die gleichzeitig als
-Partikel-Rückhalt und als Staubfilter wirken.
+Partikel-Rückhalt und als Staubfilter wirken. Die oberen Anti-Bauch-Bars
+liegen unter dem oberen Vlies und halten die langen Seitenwände beim Befüllen
+gegen Auseinanderbiegen zusammen.
 
 ## Nutzung
 
@@ -312,10 +322,13 @@ Die lokale Schnapper-Simulation läuft separat vom CAD-Export:
 
 ```bash
 ./run fem-snap
-./run fem-snap --vtk output/FEM/snap_fit_v1_1_5.vtu
-./run fem-snap --json output/FEM/snap_fit_v1_1_5.json
+./run fem-snap --vtk output/FEM/snap_fit_v1_1_6.vtu
+./run fem-snap --json output/FEM/snap_fit_v1_1_6.json
 ./run fem-hook
-./run fem-hook --json output/FEM/hook_hold_v1_1_5.json
+./run fem-hook --json output/FEM/hook_hold_v1_1_6.json
+./run fem-bulge
+./run fem-bulge --json output/FEM/trough_bulge_v1_1_6.json \
+  --vtk-dir output/FEM/vtk --plot-dir output/FEM/plots
 ```
 
 `--vtk` und `--json` legen Zielverzeichnisse wie `output/FEM/` bei Bedarf
@@ -326,6 +339,25 @@ Das `.vtu` lässt sich direkt in ParaView öffnen. Gespeichert werden:
 - nodale Verschiebungen in mm
 - maximale/minimale Hauptdehnung pro Tetraeder
 - von-Mises-Dehnungsproxy pro Tetraeder
+
+### Trogwand-Bauchung beim Befüllen
+
+Für die beobachtete Bauchung der langen Trogwände gibt es
+`fem/trough_bulge_fem.py`. Das Script bildet den Trog als vereinfachtes
+lineares PA12-Solidmodell ab, belastet die Innenflächen der langen X-Wände
+mit gleichförmigem seitlichem Granulatdruck und vergleicht den früheren
+Plain-Trog gegen den aktuellen Trog mit internen Anti-Bauch-Bars.
+
+Aktueller Befund für `v1.1.6` bei `5 kPa` Seitenlast:
+
+- Plain-Trog ohne Bars: **0.083 mm** maximale Ausbuchtung
+- aktueller Trog mit 3 internen Bars: **0.023 mm** maximale Ausbuchtung
+- Druck für 1.0 mm Ausbuchtung: **60.5 kPa → 217.8 kPa**
+- maximale Hauptdehnung bleibt bei beiden Varianten deutlich unter dem
+  konservativen PA12-`1/3`-Proxy
+
+Die erzeugten Heatmaps liegen unter `output/FEM/plots/`, die optionalen
+ParaView-Felder unter `output/FEM/vtk/`.
 
 ### Vollbaugruppen-Kontakt / Kippmontage
 
@@ -339,36 +371,35 @@ Lauf:
 
 ```bash
 ./run fem-assembly
-./run fem-assembly --json output/FEM/lid_trough_assembly_v1_1_5.json
+./run fem-assembly --json output/FEM/lid_trough_assembly_v1_1_6.json
 ```
 
 Auch hier wird das Zielverzeichnis der JSON-Datei bei Bedarf automatisch
 angelegt.
 
-Aktueller Befund für `v1.1.5`:
+Aktueller Befund für `v1.1.6`:
 
 - beste gefundene Hook-first-Kipplage im Suchraum: **`-10°`**, `dx = +0.40 mm`,
-  `dz = +0.90 mm`
-- eingehakte Kipplage: **kollisionsfrei** (`max penetration = -0.101 mm`)
+  `dz = +1.20 mm`
+- eingehakte Kipplage: **kollisionsfrei** (`max penetration = -0.163 mm`)
 - vertikale Einfädelbahn bei dieser Kipplage: **kollisionsfrei**
 - Schließbahn in die Endlage: **ohne harte Kollision**;
   verbleibende Interferenz liegt nur an den aktiven Schnappern
-  (`snap ~0.93 mm`) und ist dort die beabsichtigte elastische Einfederung
+  (`snap ~0.94 mm`) und ist dort die beabsichtigte elastische Einfederung
 - harte Restpenetration außerhalb der Schnapper: **0 Punkte**
 
 Interpretation:
 
 - Die passive Hakenleiste funktioniert jetzt auch als **praktisch nutzbare
-  Kipp-Einhakeachse**, weil die beiden passiven Deckelecken lokal entlastet
-  wurden und die flache Haken-Tasche bis an die Rabbet-Unterseite als
-  Einführkanal geöffnet ist.
+  Kipp-Einhakeachse**, weil die flache Haken-Tasche bis an die
+  Rabbet-Unterseite als Einführkanal geöffnet ist.
 - Die Hook-first-Montage ist damit geometrisch plausibel:
   erst passive Seite einhängen, dann herunterrotieren, zuletzt die
   +X-Schnapperseite eindrücken.
 - Kritisch bleibt nur noch die beabsichtigte Schnapper-Einfederung beim
   finalen Schließen, nicht mehr eine harte Baugruppen-Kollision.
-- Frühere Checker-Läufe vor den passiven Eckfreistichen sind damit
-  dokumentarisch überholt.
+- Die entfernten passiven Eckfreistiche und die neuen internen Anti-Bauch-Bars
+  erzeugen im geprüften Suchraum keine harte Baugruppen-Kollision.
 
 ### Montagezeichnungen
 
@@ -382,8 +413,8 @@ Das Script legt `output/assembly/` bei Bedarf automatisch an.
 
 Erzeugte Dateien:
 
-- `output/assembly/lid_trough_assembly_sequence_v1_1_5.svg`
-- `output/assembly/lid_trough_snap_detail_v1_1_5.svg`
+- `output/assembly/lid_trough_assembly_sequence_v1_1_6.svg`
+- `output/assembly/lid_trough_snap_detail_v1_1_6.svg`
 
 Das Sequenzblatt zeigt die Hook-first-Montage in drei Schritten, das
 Detailblatt die elastische Einfederung der aktiven Rastnase beim finalen
@@ -402,13 +433,14 @@ Selbstdurchdringungs-Clean wird übersprungen.
 Verhalten:
 
 - **trough.stl**: STEP→Gmsh ergibt eine wasserdichte STL; `pymeshfix` reduziert
-  danach 12 Selbstdurchdringungen auf 0, bei praktisch unverändertem Volumen
-  (`35.24 → 35.24 cm³`).
-- **lid.stl**: STEP→Gmsh ergibt ebenfalls eine wasserdichte STL; `pymeshfix`
-  reduziert danach 32 Selbstdurchdringungen auf 0, bei praktisch
-  unverändertem Volumen (`8.16 → 8.15 cm³`).
+  danach 13 Selbstdurchdringungen auf 0, bei praktisch unverändertem Volumen
+  (`34.88 → 34.89 cm³`).
+- **lid.stl**: STEP→Gmsh mit gröberem Lid-Remesh (`0.4 … 1.0 mm`) ergibt
+  eine wasserdichte, winding-konsistente STL; `pymeshfix` überspringt den
+  finalen Clean, weil bereits 0 Randloops und 0 Selbstdurchdringungen
+  gefunden werden (`6.76 cm³`).
 
-**Upload-Empfehlung** (Stand `v1.1.5`):
+**Upload-Empfehlung** (Stand `v1.1.6`):
 
 - `trough.stl` und `lid.stl` sind die aktuellen STL-Upload-Kandidaten
   (0 Randloops, 0 gemeldete Selbstdurchdringungen).
@@ -429,7 +461,8 @@ Export weiterhin durch und protokolliert nur den übersprungenen
 | Wandstärke | 2.2 mm | Nach Rabbet-Schulter 1.2 mm Restwand → oberhalb MJF-Minimum (1.0 mm) |
 | Bodenstärke | 2.2 mm | Gleichwertige Struktursteifigkeit, gleichzeitig Flansch-Dicke |
 | Passungsspiel `fit_clear` | 0.30 mm | MJF-typischer Toleranzbereich ±0.3 mm |
-| Hex-Raster | 10 mm flats, 1.2 mm Web, 4 mm Margin | Grösseres Raster = weniger Stegen/Fläche, besseres Entpulvern, Stege trotzdem deutlich über MJF-Minimum |
+| Hex-Raster | 10 mm flats, 1.2 mm Web, 2.8 mm X-Margin, 4.0 mm Y-Margin | Grösseres Raster = weniger Stegen/Fläche, besseres Entpulvern, Stege trotzdem deutlich über MJF-Minimum |
+| Anti-Bauch-Bars | 3 interne Querbars, 2.2 × 1.4 mm, 4.0 mm unter Deckelunterseite | Hält die langen X-Wände beim Befüllen gegen Ausbeulen zusammen, bleibt komplett innerhalb des 65-mm-Aussenmasses und lässt Platz für 3-mm-Obervlies |
 | Eckenfillet Körper | 2.0 mm | Bessere Oberfläche; Flansch-Y-Kanten bleiben scharf (Stopperfunktion) |
 | Armwurzel-Fillet | 0.5 mm | Kerbspannungsreduktion → Dauerfestigkeit des Snap-Arms |
 | Snap-Mechanik | 1 einfache Hakenleiste + 2 selbstlösende Schnapper | echte passive Halte-Seite, aber einfach und MJF-freundlich, nur zwei elastische Stellen, einhändig entriegelbar |
@@ -455,7 +488,7 @@ zu vermeiden.
 | Snap-Armwurzel (Übergang Arm → Deckelunterseite) | Fillet | 0.5 mm | Klassische Cantilever-Kerbe — ohne Radius wäre das die erste Rissstelle bei Wiederholbelastung. 0.5 mm bringt Spannungskonzentrationsfaktor von ~3 auf <1.5 | ✓ |
 | Deckel-Vertikalecken (4 Kanten entlang Z) | Fillet | 1.0 mm | Handling, konsistent mit Körperecken­fillet (2.0 mm wäre am kleineren Deckel-Footprint zu dominant) | ✓ |
 | Deckel-Oberkante (4 Aussenkanten bei Z=size_z) | Chamfer | 0.5 mm | Sichtseite von oben, verhindert Absplittern und scharfe Kante unter dem Fingerdruck zum Öffnen | ✓ |
-| Deckel-Unterkante (äussere Kanten bei Z=size_z−lid_thk inkl. Zuglippe) | Chamfer | 0.2 mm / 0.4 mm | Rabbet-Einführschräge für den Einbau; die kleine Zuglippe bekommt separat 0.4 mm. OCCT akzeptiert wegen der +X-Snapwurzel und der passiven Hakenleiste nicht alle Kanten, aktuell **2/6** Grundkanten mit 0.2 mm. Rest bleibt lokal scharf — MJF druckt sauber | Teilweise (akzeptiert) |
+| Deckel-Unterkante (äussere Kanten bei Z=size_z−lid_thk inkl. Zuglippe) | Chamfer | 0.2 mm / 0.4 mm | Rabbet-Einführschräge für den Einbau; die kleine Zuglippe bekommt separat 0.4 mm. OCCT akzeptiert wegen der +X-Snapwurzel und der passiven Hakenleiste nicht alle Kanten, aktuell **1/5** gefundene Unterkanten mit 0.2 mm. Rest bleibt lokal scharf — MJF druckt sauber | Teilweise (akzeptiert) |
 
 ### Per-Kanten-Fallback für OCCT-Grenzfälle
 
@@ -487,8 +520,9 @@ DFM-Verbesserung zu verlieren.
 
 Alle Ausfräsungen (Kavität, Rabbet, Hex, Snap-Schlitze, flache Haken-Tasche,
 Zuglippen-Freistellung) sind zur Aussenwelt bzw. nach oben geöffnet. Die
-Hex-Bohrungen im Boden und Deckel sind deckungsgleich, sodass Pulver während
-des Entpulverns frei hindurchfallen kann. Keine der Fillet- oder
+Anti-Bauch-Bars sind einfache offene Querstege, keine geschlossenen Taschen.
+Die Hex-Bohrungen im Boden und Deckel sind deckungsgleich, sodass Pulver
+während des Entpulverns frei hindurchfallen kann. Keine der Fillet- oder
 Chamfer-Operationen schafft geschlossene Taschen.
 
 ### Druckorientierung (Empfehlung fürs Bureau)
@@ -504,8 +538,8 @@ Chamfer-Operationen schafft geschlossene Taschen.
 ## Tiefenauslegung (`size_z` — Luftstromrichtung)
 
 Kompromiss zwischen Kohlekapazität und Druckverlust durch die aktiven
-Absaugungen. Nutzbarer Bettquerschnitt `cavity_x × cavity_y ≈ 60.6 × 88.6 ≈
-54 cm²`, 6 parallele Pfade.
+Absaugungen. Nutzbarer Bettquerschnitt `cavity_x × cavity_y ≈ 60.6 × 90.6 ≈
+55 cm²`, 6 parallele Pfade.
 
 Druckverlust im AC-Granulatbett (Ergun, 3-mm-Pellets, ε ≈ 0.4):
 
@@ -515,7 +549,7 @@ Druckverlust im AC-Granulatbett (Ergun, 3-mm-Pellets, ε ≈ 0.4):
 | 1.0 m/s | ~8 Pa |
 | 1.5 m/s | ~17 Pa |
 
-Bei 40 mm `size_z` ergibt sich ein Kohlebett von 29.3 mm, Kapazität ~71 g pro
+Bei 40 mm `size_z` ergibt sich ein Kohlebett von 29.3 mm, Kapazität ~72 g pro
 Kassette bei Schüttdichte ~450 kg/m³ → ~425 g gesamt über 6 Kassetten.
 Erwartete Standzeit in normaler Wohnluft: ~6 Monate. ΔP bei realistischem
 Arbeitspunkt (~0.5 m/s) ca. 50–80 Pa — verträglich mit
@@ -588,6 +622,8 @@ Script re-exportiert STEP/STL.
 - `fem/snap_fit_fem.py` — lokale 3D-FEM für den aktiven Schnapper
 - `fem/hook_hold_fem.py` — lokale 3D-FEM und Geometriecheck für die passive
   Hakenleiste
+- `fem/trough_bulge_fem.py` — lineare FEM für Trogwand-Ausbeulung beim
+  Befüllen und Heatmap-/VTK-Ausgabe
 - `fem/lid_trough_assembly.py` — Vollbaugruppen-Kontakt und Kippmontage-Check
 - `fem/assembly_sequence_svg.py` — erzeugt SVG-Montagezeichnungen
 - `README.md` — dieses Dokument

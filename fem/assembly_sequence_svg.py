@@ -2,8 +2,8 @@
 """Generate simple SVG assembly drawings for lid/trough insertion.
 
 Outputs:
-- output/assembly/lid_trough_assembly_sequence_v1_1_5.svg
-- output/assembly/lid_trough_snap_detail_v1_1_5.svg
+- output/assembly/lid_trough_assembly_sequence_v1_1_6.svg
+- output/assembly/lid_trough_snap_detail_v1_1_6.svg
 """
 
 from __future__ import annotations
@@ -83,8 +83,19 @@ def lid_outline(geom: Geometry):
     snap_lip_x = cavity_half + geom.hook_protr
 
     slab = [(-lid_half, 37.5), (lid_half, 37.5), (lid_half, 40.0), (-lid_half, 40.0)]
-    passive_relief_lo = [(-lid_half, 37.5), (-lid_half + 1.6, 37.5), (-lid_half, 39.1)]
-    passive_relief_hi = [(-lid_half, 40.0), (-lid_half + 1.6, 40.0), (-lid_half, 38.4)]
+    passive_relief_lo = []
+    passive_relief_hi = []
+    if geom.passive_corner_relief_x > 0.0 and geom.passive_corner_relief_y > 0.0:
+        passive_relief_lo = [
+            (-lid_half, 37.5),
+            (-lid_half + geom.passive_corner_relief_x, 37.5),
+            (-lid_half, 37.5 + geom.passive_corner_relief_y),
+        ]
+        passive_relief_hi = [
+            (-lid_half, 40.0),
+            (-lid_half + geom.passive_corner_relief_x, 40.0),
+            (-lid_half, 40.0 - geom.passive_corner_relief_y),
+        ]
     hook = [
         (hook_capture_x, 37.5),
         (hook_depth_x, 37.5),
@@ -146,11 +157,13 @@ def draw_lid(panel_x, panel_y, scale, geom: Geometry, angle_deg, dx_mm, dz_mm, o
             f'  <polygon points="{mm_to_svg(poly, panel_x, panel_y, scale)}" '
             f'fill="{fill}" fill-opacity="{opacity}" stroke="#1d4ed8" stroke-width="2"/>\n'
         )
-    # show passive corner reliefs as white cut triangles on the slab
+    # show optional passive corner reliefs as white cut triangles on the slab
     for poly in (
         transform_xz(relief_lo, pivot_x, pivot_z, angle_deg, dx_mm, dz_mm),
         transform_xz(relief_hi, pivot_x, pivot_z, angle_deg, dx_mm, dz_mm),
     ):
+        if not poly:
+            continue
         items.append(
             f'  <polygon points="{mm_to_svg(poly, panel_x, panel_y, scale)}" '
             'fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>\n'
@@ -178,7 +191,7 @@ def generate_sequence_svg(out_path: Path, geom: Geometry, angle_deg: float, dx_m
     svg.append(draw_lid(panel_xs[0], panel_y, scale, geom, angle_deg, dx_mm, dz_mm + 3.0))
     svg.append('  <line x1="128" y1="140" x2="185" y2="185" stroke="#111827" stroke-width="2.5" marker-end="url(#arrow)"/>\n')
     svg.append('  <text x="44" y="158" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">-X-Hakenleiste in die Tasche führen.</text>\n')
-    svg.append('  <text x="44" y="176" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Neue Eckfreistiche halten die passiven Ecken frei.</text>\n')
+    svg.append('  <text x="44" y="176" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#374151">Zweistufige Tasche führt den Haken ohne sichtbare Eckfreistiche.</text>\n')
 
     # Step 2
     svg.append('  <text x="414" y="108" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#111827">2. Um die Hakenlinie nach unten rotieren</text>\n')

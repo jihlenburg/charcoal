@@ -1,5 +1,52 @@
+# Python bytecode and caches
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyright/
+.coverage
+.coverage.*
+htmlcov/
+
+# Python packaging/build products
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Local Python environments
 .DS_Store
-.vscode/
 .venv/
+venv/
+env/
+ENV/
+
+# Local environment/config files
+.env
+.env.*
+!.env.example
+
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100/
+.Trashes/
+
+# Editor and shell noise
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Blender/render scratch and backups
+*.blend1
+*.blend2
+*.blend@

@@ -18,6 +18,7 @@ Commands:
   fem-bulge          Run fem/trough_bulge_fem.py
   fem-assembly       Run fem/lid_trough_assembly.py
   drawings           Run fem/assembly_sequence_svg.py
+  render-readme      Render docs/assets/charcoal_filter_v1_1_6_render.png
   python             Run venv Python with the given args
   pip                Run venv pip with the given args
   shell              Open a shell with the venv on PATH
@@ -171,6 +172,9 @@ case "$cmd" in
         ;;
     drawings)
         exec "$VENV_PY" "$ROOT/fem/assembly_sequence_svg.py" "$@"
+        ;;
+    render-readme)
+        exec "$VENV_PY" "$ROOT/scripts/render_readme_image.py" "$@"
         ;;
     python)
         exec "$VENV_PY" "$@"

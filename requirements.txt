@@ -9,3 +9,7 @@ numpy
 scikit-fem
 trimesh
 rtree
+
+# Documentation render workflow
+Pillow
+vtk

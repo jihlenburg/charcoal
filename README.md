@@ -11,6 +11,11 @@ eine gutmütige Alternative, ist aber nicht mehr die Konstruktionsannahme.
 
 Script: [`carbon_filter_build123d.py`](./carbon_filter_build123d.py) (build123d).
 
+![Exploded render of the filter cassette](docs/assets/charcoal_filter_v1_1_6_render.png)
+
+README-Render neu erzeugen: `./run render-readme` (Blender/Cycles, mit
+VTK-Fallback wenn Blender nicht verfügbar ist).
+
 ## Konstruktionsprinzip
 
 **Vertikaler Luftstrom durch den Filter.** Die Luft tritt durch das Hex-Gitter

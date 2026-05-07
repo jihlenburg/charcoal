@@ -1,15 +1,22 @@
+# Pinned to exact versions. OCCT minor revisions silently change fillet
+# acceptance, and build123d API has been volatile, so the printed CAD
+# output is reproducible only as long as these pins hold. Bump deliberately.
+
 # Core CAD/viewer workflow
-build123d
-ocp-vscode
+build123d==0.10.0
+cadquery-ocp==7.8.1.1.post1
+ocp_vscode==3.3.4
 
 # FEM and mesh-analysis workflow
-gmsh
-meshio
-numpy
-scikit-fem
-trimesh
-rtree
+gmsh==4.15.2
+meshio==5.3.5
+numpy==2.4.4
+scipy==1.17.1
+scikit-fem==12.0.1
+trimesh==4.12.2
+rtree==1.4.1
 
 # Documentation render workflow
-Pillow
-vtk
+matplotlib==3.10.9
+Pillow==12.2.0
+vtk==9.3.1

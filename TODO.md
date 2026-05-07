@@ -60,6 +60,25 @@ _(leer)_
 
 ## Erledigt
 
+- [x] Toolchain-Härtung: README-Sync-Checker, DFM-Alarme, FEM-Baseline-Diff,
+      exakt gepinnte Dependencies (2026-05-07):
+      - `scripts/check_readme_sync.py` (`./run check`) prüft 35 Parameter
+        zwischen Script und README, mit Trailing-Zero- und
+        Whitespace-Toleranz für deutschen Soft-Wrap
+      - `scripts/fem_baseline_diff.py` (`./run fem-diff`) vergleicht die
+        FEM-Outputs gegen unversionierte Baselines unter
+        `output/FEM/baseline/`, mit `rel`/`abs`/`exact`-Modi und
+        `--update-baseline` zum Promoten
+      - `try_fillet`/`try_chamfer` nehmen jetzt `strict=True`; die
+        README-DFM-Tabelle ist 1:1 als Annotation am Aufruf hinterlegt,
+        und ein End-of-Build-Summary bricht den Lauf bei Regression ab
+      - `requirements.txt` exakt gepinnt (build123d==0.10.0,
+        cadquery-ocp==7.8.1.1.post1, ocp_vscode==3.3.4, …); OCCT-Minor
+        ändert Fillet-Akzeptanz still
+      - `.gitignore` entdoppelt
+      - alle Toolings selbst smoke-getestet, Negativ-Pfade explizit
+        verifiziert (DFM-Alarm-Trigger, FEM-Compare-Modi)
+
 - [x] Release-Kandidat `v1.1.6` auf 95 mm Höhe, mehr Hex-Öffnungen und
       interne Anti-Bauch-Bars gebracht (2026-05-07):
       - `size_y` 93 → 95 mm, Flansch-Footprint jetzt 65 × 115 × 2.2 mm

@@ -17,7 +17,6 @@ dist/
 pip-wheel-metadata/
 
 # Local Python environments
-.DS_Store
 .venv/
 venv/
 env/

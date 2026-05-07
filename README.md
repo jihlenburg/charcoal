@@ -1,35 +1,36 @@
 # Aktivkohlefilter-Einsatz (Passivlüftung mit aktiven Absaugungen)
 
-**Version: 1.1.6** (im Script als `VERSION`-Konstante; wird als Gravur auf
-den +Y-Flanschüberstand aufgebracht und muss beim Bump synchron mitgeführt
-werden: `carbon_filter_build123d.py` → README → git-Tag).
+**Version: 1.1.6**. Der String steht im Script als `VERSION`-Konstante und
+wird als Gravur auf den +Y-Flanschüberstand übernommen. Bei jedem Versionssprung
+muss er gleichzeitig in `carbon_filter_build123d.py`, im README und am
+git-Tag nachgezogen werden.
 
-Parametrischer Filterkorb (Grundkörper + Deckel) für Wohnungslüftung durch
-Aktivkohle, konstruktiv auf HP Multi Jet Fusion in **PA12** abgestimmt
-(`HP 3D HR PA 12 enabled by Evonik` oder vergleichbar). PA11 bleibt weiterhin
-eine gutmütige Alternative, ist aber nicht mehr die Konstruktionsannahme.
+Parametrischer Filterkorb aus Grundkörper und Deckel für die Wohnungs­lüftung
+mit Aktivkohle. Die Konstruktion ist für HP Multi Jet Fusion in **PA12**
+ausgelegt (`HP 3D HR PA 12 enabled by Evonik` oder vergleichbar). PA11 ist
+nach wie vor eine tolerantere Alternative, aber nicht mehr der Konstruktionsfall.
 
-Script: [`carbon_filter_build123d.py`](./carbon_filter_build123d.py) (build123d).
+Quellcode: [`carbon_filter_build123d.py`](./carbon_filter_build123d.py) (build123d).
 
 ![Exploded render of the filter cassette](docs/assets/charcoal_filter_v1_1_6_render.png)
 
-README-Render neu erzeugen: `./run render-readme` (Blender/Cycles, mit
-VTK-Fallback wenn Blender nicht verfügbar ist).
+Das README-Render entsteht über `./run render-readme` (Blender/Cycles, mit
+VTK-Fallback, falls Blender fehlt).
 
 ## Konstruktionsprinzip
 
 **Vertikaler Luftstrom durch den Filter.** Die Luft tritt durch das Hex-Gitter
-auf einer Z-Seite (Deckel) ein, durchströmt das Aktivkohlebett und tritt durch
-das Hex-Gitter auf der anderen Z-Seite (Boden) aus. Im Skript-Koordinatensystem
-ist Z die Luftstromachse; beim Einbau wird die Kassette um 90° gekippt, sodass
-Z horizontal zur Schachttiefe wird.
+auf der einen Z-Seite (Deckel) ein, durchströmt das Aktivkohlebett und
+verlässt die Kassette durch das Hex-Gitter auf der anderen Z-Seite (Boden).
+Im Skript-Koordinatensystem ist Z die Luftstromachse — eingebaut steht die
+Kassette um 90° gekippt, sodass Z horizontal zur Schachttiefe wird.
 
 ### Befüllung (Kassette stehend, Deckel oben)
 
 1. Finger in die mittige Freistellung an der Schnapper-Seite setzen und den
-   Deckel am kleinen Zugsteg nach oben anheben; die beiden Schnapper lösen
-   dabei über ihre Auslöserampe selbsttätig aus, während die Hakenleiste auf
-   der Gegenseite den Deckel in ihrer Tasche hält und die Öffnungsseite definiert
+   Deckel am kleinen Zugsteg nach oben anheben. Die beiden Schnapper lösen
+   sich dabei über ihre Auslöserampe selbsttätig; auf der Gegenseite hält die
+   Hakenleiste den Deckel in ihrer Tasche und gibt damit die Öffnungs­seite vor
 2. Filtervlies auf den Boden legen (3 mm, dichtet Hex gegen Granulatdurchfall)
 3. Aktivkohlegranulat einfüllen (~29 mm Schüttung, ~72 g bei 450 kg/m³)
 4. Zweites Filtervlies obenauf; die internen Anti-Bauch-Bars liegen 4.0 mm
@@ -62,16 +63,15 @@ eingeschoben, der **Boden zeigt nach vorne** in die Wohnung. Gründe:
 
 ### Abdichtung mit Moosgummi
 
-Die Y-Flächen der Kassette (im Skript-Frame oben/unten) kontaktieren im Schacht
-die **harten** oberen und unteren Schachtwände. Dafür sind sie glatt und
-durchbruchfrei ausgelegt. Vor dem Einschieben werden **Moosgummistreifen** auf
-diese beiden Flächen geklebt; sie pressen sich beim Einschub an und dichten
-axial gegen Leckluft vorbei am Filterbett.
+Die Y-Flächen der Kassette — im Skript-Frame oben und unten — kontaktieren
+im Schacht die **harten** oberen und unteren Schachtwände. Sie sind dafür
+glatt und ohne Durchbrüche ausgeführt. Vor dem Einschub werden auf beide
+Flächen **Moosgummistreifen** geklebt; beim Einschieben werden sie
+zusammengepresst und dichten dadurch axial gegen Leckluft am Filterbett vorbei.
 
-Eine X-Fläche trägt die Snap-Durchbrüche, die gegenüberliegende eine
-flache Haken-Tasche im oberen Wandbereich. Beide X-Flächen pressen sich
-in den seitlichen Schaumstoff — auch hier entsteht eine Dichtung durch den
-Schaum.
+Auf der einen X-Fläche sitzen die Snap-Durchbrüche, gegenüber eine flache
+Haken-Tasche im oberen Wandbereich. Beide X-Flächen drücken sich in den
+seitlichen Schaumstoff und werden so durch den Schaum selbst abgedichtet.
 
 ## Geometrie
 
@@ -147,48 +147,36 @@ Release).
 
 ### Variantenvergleich
 
-- **Nur Führungsleiste**:
-  Sehr einfach und MJF-freundlich, aber keine passive Haltefunktion. Die
-  Gegenseite positioniert nur, sie trägt keinen Aufwärtslastpfad.
-- **Einfache Hakenleiste**:
-  Beste Balance. Ein echter Formschluss auf einer Seite, aber nur als flache,
-  gut entpulverbare Tasche mit kleiner Überdeckung.
-- **Tiefes Haken-/Taschensystem**:
-  Mechanisch eindeutig, aber unnötig komplex, toleranzempfindlicher und für
-  diesen Anwendungsfall überzogen.
+- **Nur Führungsleiste**: sehr einfach und für MJF gut druckbar, aber
+  ohne passive Haltefunktion. Die Gegenseite positioniert nur, sie trägt
+  keinen Aufwärtslastpfad.
+- **Einfache Hakenleiste**: der beste Kompromiss. Ein echter Formschluss auf
+  einer Seite, dabei aber nur eine flache, gut entpulverbare Tasche mit
+  kleiner Überdeckung.
+- **Tiefes Haken-/Taschensystem**: mechanisch eindeutig, aber unnötig komplex,
+  toleranzempfindlicher und für diesen Anwendungsfall überdimensioniert.
 
 ### Öffnungsbewegung und Kraftfluss
 
-Geschlossener Zustand:
+Im geschlossenen Zustand greifen auf der Schnapper-Seite die beiden Rastlippen
+über die Oberkante der Slots, und auf der Gegenseite sitzt die einfache
+Hakenleiste mit etwa `1.1 mm` Überdeckung unter dem Taschendach. Ein
+Aufwärtszug am Deckel verteilt sich deshalb nicht nur auf die Schnapper,
+sondern wird als Moment zwischen Schnapper- und Hakenseite aufgenommen.
 
-- Auf der Schnapper-Seite halten die beiden Rastlippen gegen die Oberkante der
-  Slots.
-- Auf der Gegenseite sitzt die einfache Hakenleiste mit etwa `1.1 mm`
-  Überdeckung unter dem Taschen-Dach.
-- Ein Aufwärtszug am Deckel wird daher nicht nur von den Schnappern, sondern
-  als Moment zwischen Schnapper-Seite und Haken-Seite aufgenommen.
+Das Öffnen beginnt an der mittigen Zuglippe auf der Schnapper-Seite. Die
+Fingerkraft erzeugt dort ein Drehmoment um die passive Hakenseite, und die
+oberen Auslöserampen der Schnapper laufen gegen die Slot-Kante. Aus dem
+vertikalen Hub wird dadurch eine seitliche Arm-Auslenkung; die Reaktions­kraft
+fließt vom Finger über den Deckel in die Schnapper und von dort in die
+Trogwand der Slot-Seite.
 
-Beginn des Öffnens:
-
-- Die Fingerkraft greift an der mittigen Zuglippe auf der Schnapper-Seite an.
-- Dadurch entsteht ein Drehmoment um die passive Haken-Seite.
-- Die oberen Auslöserampen der Schnapper laufen gegen die Slot-Kante und
-  wandeln den vertikalen Hub in seitliche Arm-Auslenkung um.
-- Die dabei entstehende Reaktionskraft geht vom Finger über den Deckel in die
-  Schnapper, von dort in die Trogwand der Slot-Seite.
-
-Nach dem Lösen der Schnapper:
-
-- Die Schnapper sind weitgehend lastfrei.
-- Die passive Haken-Seite übernimmt die Führung und den Rest des Öffnungsmoments.
-- Der Deckel klappt um diese Seite hoch, statt auf beiden Seiten gleichzeitig
-  lose zu werden.
-
-Vollständiges Abnehmen:
-
-- Nach dem Hochklappen wird der Deckel leicht zur Schnapper-Seite verschoben,
-  damit der passive Haken aus seiner Tasche frei kommt.
-- Erst dann wird er komplett nach oben abgehoben.
+Sobald die Schnapper ausgelöst haben, sind sie weitgehend lastfrei. Den Rest
+des Öffnungsmoments übernimmt die passive Hakenseite: der Deckel klappt um
+sie hoch, statt auf beiden Seiten gleichzeitig lose zu werden. Zum
+vollständigen Abnehmen wird er nach dem Hochklappen leicht zur Schnapper-Seite
+verschoben, sodass der passive Haken aus seiner Tasche frei kommt — erst dann
+lässt er sich nach oben abheben.
 
 ### Öffnungskraft / Werkzeugfreiheit
 
@@ -217,51 +205,48 @@ Damit ist die Bedienung realistisch **ohne Werkzeug** und mit einer einzigen
 Fingerbewegung. Die Schnapper müssen nicht separat gedrückt werden; beim
 Anheben an der Zuglippe fahren sie über die Auslöserampe selbst nach innen.
 
-HPs Snap-Fit-Handbook empfiehlt als grobe Daumenregel eine zulässige Dehnung
-von weniger als `1/3` der Fliessdehnung. Mit HP-PA12 (`~9 … 11 %` Yield im
-5600-Datenblatt) ergibt sich damit ein Zielbereich `< 3.0 … 3.7 %`; die
-aktuellen `~2.02 %` liegen darunter. Für diesen Anwendungsfall
-(wenige Öffnungszyklen pro Jahr) ist das für PA12 deutlich plausibler als die
-vorige kurze 7-mm-Geometrie.
+HPs Snap-Fit-Handbook gibt als grobe Faustregel eine zulässige Dehnung
+unter `1/3` der Fließdehnung an. Mit HP-PA12 (`~9 … 11 %` Fließdehnung laut
+5600-Datenblatt) liegt der Zielbereich damit bei `< 3.0 … 3.7 %`; die
+aktuellen `~2.02 %` bleiben deutlich darunter. Bei nur wenigen Öffnungs­zyklen
+pro Jahr ist das für PA12 weit plausibler als die ältere kurze 7-mm-Geometrie.
 
 ### Lokale FEM des Schnappers
 
-Zusätzlich zur schnellen Balkenabschätzung gibt es jetzt eine lokale
-3D-FE-Analyse in `fem/snap_fit_fem.py`.
-Das Modell bildet **einen aktiven Schnapper** mit der aktuellen
-`v1.1.6`-Nasenform ab, belastet die reale Rastfläche mit `1 N` in `+X` und
-skaliert die Antwort dann auf die nötige Öffnungs-Auslenkung
-`hook_protr + fit_clear = 1.40 mm`.
+Zur Balkenabschätzung kommt eine lokale 3D-FE-Analyse in
+`fem/snap_fit_fem.py` dazu. Das Modell bildet **einen aktiven Schnapper** in
+der aktuellen `v1.1.6`-Nasenform ab, belastet die reale Rastfläche mit
+`1 N` in `+X` und skaliert die Antwort anschließend auf die nötige
+Öffnungs-Auslenkung `hook_protr + fit_clear = 1.40 mm`.
 
-Wichtig:
+Drei Vorbehalte zum Mitlesen:
 
-- Das ist bewusst ein **lokales Submodell**, kein vollständiges Kontaktmodell
-  von Deckel, Trog und Gegenhaken.
-- Die FE-Kraft ist **konservativer** als die Balkenformel, weil die Last an
-  der realen Rastfläche bei `z ≈ -8.5 mm` angreift und nicht am absoluten
-  Tip des Arms.
-- Der echte `0.5 mm`-Armradius an der Deckelwurzel ist in diesem ersten
-  FE-Modell noch nicht explizit ausmodelliert; die reale Spitzen-Dehnung
-  sollte daher eher leicht tiefer liegen.
+- Es ist bewusst nur ein **lokales Submodell**, kein vollständiges
+  Kontaktmodell aus Deckel, Trog und Gegenhaken.
+- Die FE-Kraft fällt **konservativer** aus als die Balkenformel, weil die
+  Last an der realen Rastfläche bei `z ≈ -8.5 mm` ansetzt, nicht am freien
+  Armende.
+- Der `0.5 mm`-Armradius an der Deckelwurzel ist in diesem ersten Modell
+  noch nicht explizit vernetzt; die echte Spitzendehnung dürfte deshalb
+  leicht niedriger liegen.
 
-Aktueller Stand mit `mesh_size = 0.25 mm` und nominal `E = 2150 MPa`:
+Aktueller Stand mit `mesh_size = 0.25 mm` und nominalem `E = 2150 MPa`:
 
 - laterale Federsteifigkeit pro Schnapper: **~7.3 N/mm**
 - nötige laterale Auslenkkraft pro Schnapper für `1.40 mm`: **~10.3 N**
 - geschätzte Gesamt-Hebekraft zum Öffnen: **~8.0 … 10.6 N**
 - maximale Hauptdehnung beim Öffnen: **~3.4 %**
 
-Damit bleibt werkzeugloses Öffnen weiterhin plausibel. Für wiederholtes
-Öffnen liegt die erste FE-Abschätzung noch innerhalb des HP-`1/3`-Proxybands
-für PA12 (`< 3.0 … 3.7 %`), aber mit kleinerer Reserve als die reine
-Balkenformel suggeriert.
+Werkzeugloses Öffnen bleibt damit plausibel. Wiederholtes Öffnen liegt im
+HP-`1/3`-Proxyband für PA12 (`< 3.0 … 3.7 %`), aber mit kleinerer Reserve,
+als die reine Balkenformel vermuten lässt.
 
 ### Lokale FEM der passiven Hakenleiste
 
-Für die passive Hakenleiste gibt es zusätzlich `fem/hook_hold_fem.py`. Das
-Modell belastet den unteren Haken-Nasenbereich mit `1 N` nach unten, klemmt
-den oberen Steg als Deckelanschluss und skaliert die lineare Elastizität bis
-zum PA12-`1/3`-Proxyband.
+Für die passive Hakenleiste gibt es das Pendant-Modell `fem/hook_hold_fem.py`.
+Es belastet den unteren Hakennasenbereich mit `1 N` nach unten, klemmt den
+oberen Steg als Deckelanschluss ein und skaliert die lineare Elastizität bis
+zum PA12-`1/3`-Proxyband hoch.
 
 Aktueller Befund für `v1.1.6`:
 
@@ -273,11 +258,11 @@ Aktueller Befund für `v1.1.6`:
 - vertikale lokale Steifigkeit der Hakenleiste: **~1027 N/mm**
 - PA12-`1/3`-Proxy-Haltekraft strukturell: **~174 … 213 N**
 
-Interpretation: Die PA12-Festigkeit der Hakenleiste ist nicht der begrenzende
-Faktor. Entscheidend war die Geometrie: `v1.1.3` hatte real nur etwa
-`0.70 mm` Untergriff und einen `0.40 mm` dünnen oberen Hakensteg. `v1.1.5`
-erhöht den Untergriff, macht den Haken selbst druckbarer und ergänzt eine
-sichtbare Retentionslippe in der Trogwand.
+Interpretation: Nicht die PA12-Festigkeit der Hakenleiste war der begrenzende
+Faktor, sondern ihre Geometrie. `v1.1.3` hatte real nur etwa `0.70 mm`
+Untergriff und einen mit `0.40 mm` zu dünnen oberen Hakensteg. Ab `v1.1.5`
+ist der Untergriff vergrößert, der Haken selbst sauberer druckbar und in der
+Trogwand sitzt eine sichtbare Retentionslippe.
 
 ### Innenaufbau (Luftweg-Richtung: Deckel → Boden)
 
@@ -285,10 +270,10 @@ sichtbare Retentionslippe in der Trogwand.
 Hex-Deckel → 3 mm Filtervlies → Anti-Bauch-Bars / Aktivkohlebett (~29 mm) → 3 mm Filtervlies → Hex-Boden
 ```
 
-Das Bett sitzt zwischen zwei Vlieslagen, die gleichzeitig als
-Partikel-Rückhalt und als Staubfilter wirken. Die oberen Anti-Bauch-Bars
-liegen unter dem oberen Vlies und halten die langen Seitenwände beim Befüllen
-gegen Auseinanderbiegen zusammen.
+Das Bett sitzt zwischen zwei Vlieslagen; sie halten die Pellets zurück und
+fangen gleichzeitig Staub ab. Die Anti-Bauch-Bars liegen unter dem oberen
+Vlies und halten die langen Seitenwände beim Befüllen davon ab, sich nach
+außen zu biegen.
 
 ## Nutzung
 
@@ -321,6 +306,36 @@ Für manuelle Python-/Pip-Kommandos innerhalb derselben Umgebung:
 ./run shell
 ```
 
+### Konsistenz-Check Script ↔ README
+
+Die geometrischen Konstanten (Außenmaße, Wandstärken, Hex-Raster,
+Anti-Bauch-Bars, Snap- und Hook-Maße) und der `VERSION`-String stehen doppelt
+im Repo: einmal als Variablen im Script, einmal als Prosa- und Tabellenwerte
+in diesem README. Damit beide nicht auseinanderlaufen, gleicht sie ein
+Sync-Checker laufend ab:
+
+```bash
+./run check
+```
+
+Der Checker parst `carbon_filter_build123d.py` per AST, formatiert jeden
+registrierten Wert so, wie er im README erscheinen würde (mit
+Trailing-Zero-Toleranz, also `1.0` ↔ `1`), und sucht ihn als regulären
+Ausdruck im README — auch über Soft-Wrap-Zeilenumbrüche hinweg. Vor jeder
+Geometrie- oder Versions­änderung sollte der Lauf grün durchgehen.
+
+### DFM-Strict-Modus
+
+`try_fillet` und `try_chamfer` werden im Build an genau den Stellen mit
+`strict=True` aufgerufen, die in der DFM-Tabelle den Status ✓ („vollständig
+akzeptiert") tragen. Verliert eine dieser Stellen Kanten an OCCT, bricht
+`./run cad` mit einer FATAL-Meldung ab: die README-Garantie wäre dann
+verletzt und der Druck nicht mehr vertrauenswürdig. Stellen, die in der
+Tabelle ohnehin als OCCT-Grenzfall geführt werden (die `flange corner`-Schelfs
+und die `lid bot perim`-Innenkanten), bleiben best-effort und tauchen
+einfach als „skipped" in der Zusammenfassung auf. Am Ende der Build-Phase
+schreibt das Script eine kompakte Übersicht aller DFM-Operationen ins Log.
+
 ### FEM ausführen
 
 Die lokale Schnapper-Simulation läuft separat vom CAD-Export:
@@ -335,6 +350,28 @@ Die lokale Schnapper-Simulation läuft separat vom CAD-Export:
 ./run fem-bulge --json output/FEM/trough_bulge_v1_1_6.json \
   --vtk-dir output/FEM/vtk --plot-dir output/FEM/plots
 ```
+
+#### FEM-Baseline-Vergleich
+
+Jeder Solver schreibt eine JSON-Datei mit den wichtigsten Skalaren:
+Steifigkeiten, Haltekräfte, Maximaldehnungen, Penetrationen. Diese Werte
+werden gegen eine eingecheckte Baseline unter `output/FEM/baseline/` geprüft,
+damit eine Geometrie- oder Solver-Änderung das Antwortverhalten nicht
+unbemerkt verschiebt:
+
+```bash
+./run fem-diff                    # nur Vergleich, kein Schreiben
+./run fem-diff --update-baseline  # aktuelle Ergebnisse als neue Referenz übernehmen
+```
+
+Die Default-Toleranz liegt bewusst lose bei ±15 % relativ. Die
+PA12-Modul-Unsicherheit beträgt schon auf Materialebene ±15 %; engere
+Schranken würden nur Fehlalarme produzieren. Felder, die physikalisch exakt
+sein müssen (Penetrations-Punkte, Feasibility-Flags), werden dagegen hart
+verglichen. Eine bewusst akzeptierte Designänderung wird mit
+`--update-baseline` als neue Referenz übernommen. Die Baseline-Dateien
+heißen absichtlich versionsfrei (`snap_fit.json` statt `snap_fit_v1_1_6.json`),
+damit sie ein Versionssprung nicht verwaisen lässt.
 
 `--vtk` und `--json` legen Zielverzeichnisse wie `output/FEM/` bei Bedarf
 automatisch an.
@@ -585,22 +622,21 @@ nicht am freien Armende an.
 
 ## Materialwahl PA12 vs. PA11
 
-Lastprofil: ca. 10 Öffnungs-/Schliesszyklen in 5 Jahren, Innenraumluft,
-Kontakt mit Aktivkohle.
+Lastprofil: rund 10 Öffnungs-/Schliesszyklen in fünf Jahren, reine
+Innenraumluft, ständiger Kontakt mit Aktivkohle.
 
-- **PA12 ist jetzt die Zielgeometrie**: längere Schnapparme, grössere
-  Rastüberdeckung und eine kräftigere passive Hakenleiste sind explizit so
-  gewählt, dass HP-PA12 damit plausibel wiederholt und werkzeugfrei bedienbar
-  bleibt.
-- **PA11 bleibt die robustere Snap-Fit-Wahl**, falls ein Dienstleister es
-  ohne Mehrpreis anbietet oder wenn deutlich häufigere Öffnungszyklen erwartet
-  werden.
-- **PA12 bleibt attraktiver im Standard-Bureau-Workflow**: verbreitet, günstig
-  und für dieses Lastprofil ausreichend, solange die Geometrie nicht wieder auf
-  die ältere, kürzere 7-mm-Snap-Version zurückfällt.
+**PA12 ist die aktuelle Zielgeometrie.** Längere Schnapparme, grössere
+Rastüberdeckung und eine kräftigere passive Hakenleiste sind genau so
+gewählt, dass das Bauteil sich auch in HP-PA12 wiederholt und werkzeugfrei
+bedienen lässt. Dazu kommt das praktische Argument: PA12 ist beim
+Druckdienstleister Standard, günstig und für dieses Lastprofil ausreichend,
+solange die Geometrie nicht zur älteren kurzen 7-mm-Snap-Version
+zurückkehrt.
 
-**Bureau-Bezug**: Für die aktuelle Version ist PA12 der Default. PA11 ist ein
-optional noch gutmütigerer Fallback, nicht mehr umgekehrt.
+**PA11 ist die robustere Snap-Fit-Wahl** und lohnt sich, sobald ein
+Dienstleister es ohne Aufpreis druckt oder die Kassette deutlich öfter
+geöffnet werden soll. Damit hat sich die Rolle umgedreht: PA11 ist heute
+die ruhige Reserve, nicht mehr der Default.
 
 **Druckorientierung** (falls angebbar): Snap-Arm-Biegerichtung parallel zu
 den Pulverschichten legen, nicht senkrecht. MJF ist nahezu isotrop, aber
@@ -612,21 +648,23 @@ und durch die Snap-Schlitze.
 
 ## Lizenz
 
-Das Projekt nutzt bewusst eine geteilte Lizenz:
+Das Projekt nutzt bewusst zwei verschiedene Lizenzen — je nachdem, ob ein
+Artefakt eher als Hardware-Design oder eher als Software einzuordnen ist:
 
 - **Hardware-Design, CAD-/STEP-/STL-/SVG-Ausgaben, FEM-Ausgaben und
-  Designdokumentation**: CERN Open Hardware Licence Version 2 - Strongly
+  Designdokumentation**: CERN Open Hardware Licence Version 2 — Strongly
   Reciprocal (`CERN-OHL-S-2.0`)
 - **Software-Scripte und Tooling**: GNU Affero General Public License v3.0
   or later (`AGPL-3.0-or-later`)
 
-`carbon_filter_build123d.py` ist sowohl parametrische CAD-Quelle des
-physischen Produkts als auch ausführbares Python-Script. Es ist deshalb als
-Hardware-Design-Source unter `CERN-OHL-S-2.0` lizenziert und, soweit es als
-Software behandelt wird, zusätzlich unter `AGPL-3.0-or-later`.
+`carbon_filter_build123d.py` ist beides gleichzeitig: parametrische CAD-Quelle
+des physischen Produkts und ausführbares Python-Script. Sie steht deshalb als
+Hardware-Design-Quelle unter `CERN-OHL-S-2.0` und, soweit sie als Software
+behandelt wird, zusätzlich unter `AGPL-3.0-or-later`.
 
-Der kurze Lizenzhinweis steht in `LICENSE`, die vollständigen Lizenztexte in
-`LICENSES/CERN-OHL-S-2.0.txt` und `LICENSES/AGPL-3.0-or-later.txt`.
+Der kurze Projekt-Lizenzhinweis liegt in `LICENSE`; die vollständigen
+Lizenztexte stehen unter `LICENSES/CERN-OHL-S-2.0.txt` und
+`LICENSES/AGPL-3.0-or-later.txt`.
 
 ## Parameter im Script
 
@@ -651,6 +689,12 @@ Script re-exportiert STEP/STL.
   Befüllen und Heatmap-/VTK-Ausgabe
 - `fem/lid_trough_assembly.py` — Vollbaugruppen-Kontakt und Kippmontage-Check
 - `fem/assembly_sequence_svg.py` — erzeugt SVG-Montagezeichnungen
+- `scripts/check_readme_sync.py` — `./run check`: prüft Geometrie- und
+  Versions-Konstanten zwischen Script und README
+- `scripts/fem_baseline_diff.py` — `./run fem-diff`: vergleicht die FEM-JSONs
+  gegen `output/FEM/baseline/` mit `--update-baseline` zum Promoten
+- `scripts/render_readme_image.py` — Blender/VTK-Rendering des Hero-Bilds
+- `output/FEM/baseline/` — eingecheckte FEM-Referenzergebnisse für `fem-diff`
 - `README.md` — dieses Dokument
 - `CLAUDE.md` — Arbeitsanweisungen für Claude in diesem Repo
 - `TODO.md` — offene Aufgaben

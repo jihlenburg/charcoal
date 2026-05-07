@@ -4,6 +4,77 @@ Chronologisches Protokoll der Design- und Toolchain-Entscheidungen.
 
 ## 2026-05-07
 
+### Toolchain-Härtung: README-Sync, DFM-Alarme, FEM-Baseline-Diff, Pinning
+
+Bisher hat der Repo-Workflow auf Selbstdisziplin gesetzt: Geometrie­konstanten
+und `VERSION` mussten zwischen `carbon_filter_build123d.py` und `README.md`
+manuell synchron gehalten werden, `try_fillet`/`try_chamfer` haben fehlende
+Kanten leise auf STDOUT protokolliert, und FEM-Resultate wurden zwar als JSON
+nach `output/FEM/` geschrieben, aber nicht gegen einen Referenzstand
+verglichen. Bei einem Repo, dessen „Deploy" ein bezahlter Druck beim Bureau
+ist, sind stille Regressionen die teuerste Fehlerklasse — deshalb diese
+Toolchain-Härtung.
+
+Hinzugefügt:
+
+- `scripts/check_readme_sync.py` (`./run check`): AST-parst Modul-Konstanten
+  aus dem CAD-Script und prüft pro Parameter eine Liste regulärer Ausdrücke
+  gegen `README.md`. Trägt Trailing-Zero-Toleranz (`1.0` ↔ `1`) und
+  Whitespace-tolerantes Matching (für deutschen Soft-Wrap wie
+  `1.1 mm\n  Lippenüberstand`). Aktuelle Abdeckung: 35 Sync-Punkte
+  (VERSION, Außenmaße, Wandstärken, Hex-Raster, Anti-Bauch-Bars, Snap- und
+  Hook-Geometrie, Gravur).
+- `scripts/fem_baseline_diff.py` (`./run fem-diff`): vergleicht die
+  versionierten FEM-Outputs (`<solver>_v1_1_6.json`) gegen unversionierte
+  Baselines unter `output/FEM/baseline/<solver>.json` mit feldweise
+  konfigurierbaren Toleranzen (`rel`, `abs`, `exact`). Default-Toleranz
+  ±15 % relativ — bewusst lose, weil PA12-Modul-Unsicherheit bereits
+  ±15 % beträgt und engere Schranken unecht alarmieren würden. Penetration-
+  Counts und Feasibility-Flags sind exakt geprüft. `--update-baseline`
+  promotet die aktuelle Lage zur neuen Referenz nach einer bewussten
+  Designänderung.
+- DFM-Alarme in `try_fillet`/`try_chamfer`: neuer `strict=True`-Schalter
+  pro Aufruf, neuer `_dfm_log` und ein `_print_dfm_summary()` am Ende des
+  Build-Phase. Sites, die laut README-DFM-Tabelle vollständig akzeptiert
+  werden müssen (`flange bottom`, `flange step`, `cavity floor`, `rabbet`,
+  `lid top perim`, `lid corner`), sind als `strict=True` markiert; der Lauf
+  bricht hart ab, sobald OCCT dort eine Kante verliert. Bekannt
+  problematische Stellen aus der DFM-Tabelle (`flange corner`-Schelfs,
+  `lid bot perim`) bleiben best-effort.
+- `requirements.txt` und `requirements-heal.txt` exakt gepinnt
+  (`build123d==0.10.0`, `cadquery-ocp==7.8.1.1.post1`,
+  `ocp_vscode==3.3.4`, …). OCCT-Minor-Versionen ändern Fillet-Akzeptanz
+  still — der gedruckte Stand ist nur reproduzierbar, solange diese Pins
+  halten.
+- `.gitignore` entrümpelt (doppelter `.DS_Store`-Eintrag entfernt).
+
+Validierung:
+
+- `./run check`: 35/35 Parameter im Sync.
+- `./run cad`: DFM-Tabelle zeigt 6 strict / 5 best-effort Sites; alle strict
+  Sites bei 100 %; bekannt versagende Sites mit dokumentierten Skips.
+  Negativtest mit temporär `strict=True` auf `flange corner`: korrekt
+  abgebrochen mit FATAL-Meldung und `✗`-Markierung in der Tabelle.
+- `./run fem-diff`: 22/22 Felder innerhalb der Schwellen gegen die initialen
+  Baselines (mit `--update-baseline` aus den aktuellen Outputs erzeugt).
+- `compare()`-Modi (`rel`/`abs`/`exact`) gegen synthetische Werte einzeln
+  verifiziert.
+
+Entscheidungen / verworfene Alternativen:
+
+- Baselines unversioniert (`baseline/snap_fit.json`) statt versionsstempel
+  (`baseline/snap_fit_v1_1_6.json`): so bleiben sie über Versions-Bumps
+  gültig, statt zu verwaisen. Promotion via expliziten
+  `--update-baseline`-Schritt.
+- Sync-Checker arbeitet regex-basiert auf der bestehenden README-Prosa, statt
+  die README aus den Konstanten zu generieren — die deutsche Erzählstruktur
+  ist schwer maschinell zu rekonstruieren, und die geringe Änderungs­frequenz
+  rechtfertigt die Asymmetrie nicht.
+- DFM-Alarme als `strict`-Flag pro Aufruf, nicht als globale Mindest-Edge-
+  Counts: die Call-Site-Annotation entspricht direkt der README-DFM-Tabelle
+  („Status: ✓" vs. „Akzeptiert"), und neue Aufrufe erben sicher das
+  best-effort-Default.
+
 ### Lizenzierung auf Hardware/Software-Split umgestellt
 
 Der initiale GitHub-`LICENSE`-Stand war AGPLv3. Das ist für die Python-Tools

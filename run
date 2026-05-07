@@ -17,8 +17,11 @@ Commands:
   fem-hook           Run fem/hook_hold_fem.py
   fem-bulge          Run fem/trough_bulge_fem.py
   fem-assembly       Run fem/lid_trough_assembly.py
+  fem-diff           Compare current FEM JSONs against baselines
+                     (--update-baseline accepts current as new reference)
   drawings           Run fem/assembly_sequence_svg.py
   render-readme      Render docs/assets/charcoal_filter_v1_1_6_render.png
+  check              Verify README ↔ script geometry/version sync
   python             Run venv Python with the given args
   pip                Run venv pip with the given args
   shell              Open a shell with the venv on PATH
@@ -169,6 +172,12 @@ case "$cmd" in
         ;;
     fem-assembly)
         exec "$VENV_PY" "$ROOT/fem/lid_trough_assembly.py" "$@"
+        ;;
+    fem-diff)
+        exec "$VENV_PY" "$ROOT/scripts/fem_baseline_diff.py" "$@"
+        ;;
+    check)
+        exec "$VENV_PY" "$ROOT/scripts/check_readme_sync.py" "$@"
         ;;
     drawings)
         exec "$VENV_PY" "$ROOT/fem/assembly_sequence_svg.py" "$@"

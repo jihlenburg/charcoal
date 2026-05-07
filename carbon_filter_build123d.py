@@ -294,16 +294,33 @@ hex_pattern = hex_centers(
 )
 
 
-def try_fillet(edges, radius, label):
+# DFM (fillet/chamfer) accounting. Each try_fillet / try_chamfer call appends
+# a record here. After both build blocks finish, _print_dfm_summary() emits a
+# table and aborts the run if any `strict=True` site lost edges to OCCT —
+# i.e. a guarantee in the README's DFM table has silently regressed.
+_dfm_log: list[dict] = []
+
+
+def try_fillet(edges, radius, label, *, strict=False):
     """Fillet edges, falling back to per-edge attempts if the batch fails.
     Returns (ok_count, skipped_count). build123d raises if ANY single edge
     in a batch can't support the requested radius — so on failure we try
-    each edge alone to keep as much smoothing as possible."""
+    each edge alone to keep as much smoothing as possible.
+
+    `strict=True` marks a site whose README DFM-table entry promises full
+    success. _print_dfm_summary() turns any skip there into a hard failure.
+    """
+    requested = len(edges) if edges else 0
     if not edges:
+        _dfm_log.append({"label": label, "kind": "fillet", "size": radius,
+                         "ok": 0, "skip": 0, "requested": 0, "strict": strict})
         return 0, 0
     try:
         fillet(edges, radius=radius)
-        return len(edges), 0
+        _dfm_log.append({"label": label, "kind": "fillet", "size": radius,
+                         "ok": requested, "skip": 0, "requested": requested,
+                         "strict": strict})
+        return requested, 0
     except Exception:
         ok, skip = 0, 0
         for e in edges:
@@ -317,16 +334,28 @@ def try_fillet(edges, radius, label):
                 f"NOTE: {label} fillet: {ok}/{ok+skip} edges at r={radius}, "
                 f"{skip} skipped (curvature conflict)"
             )
+        _dfm_log.append({"label": label, "kind": "fillet", "size": radius,
+                         "ok": ok, "skip": skip, "requested": requested,
+                         "strict": strict})
         return ok, skip
 
 
-def try_chamfer(edges, length, label):
-    """Chamfer edges with per-edge fallback; same rationale as try_fillet."""
+def try_chamfer(edges, length, label, *, strict=False):
+    """Chamfer edges with per-edge fallback; same rationale as try_fillet.
+
+    `strict=True` aborts the run on any skipped edge.
+    """
+    requested = len(edges) if edges else 0
     if not edges:
+        _dfm_log.append({"label": label, "kind": "chamfer", "size": length,
+                         "ok": 0, "skip": 0, "requested": 0, "strict": strict})
         return 0, 0
     try:
         chamfer(edges, length=length)
-        return len(edges), 0
+        _dfm_log.append({"label": label, "kind": "chamfer", "size": length,
+                         "ok": requested, "skip": 0, "requested": requested,
+                         "strict": strict})
+        return requested, 0
     except Exception:
         ok, skip = 0, 0
         for e in edges:
@@ -340,7 +369,46 @@ def try_chamfer(edges, length, label):
                 f"NOTE: {label} chamfer: {ok}/{ok+skip} edges at L={length}, "
                 f"{skip} skipped"
             )
+        _dfm_log.append({"label": label, "kind": "chamfer", "size": length,
+                         "ok": ok, "skip": skip, "requested": requested,
+                         "strict": strict})
         return ok, skip
+
+
+def _print_dfm_summary() -> None:
+    """Tabulate every DFM op and abort if a strict site lost edges.
+
+    The summary mirrors the README's DFM table semantics: known-failing OCCT
+    cases (flange corner shelves, lid bottom perimeter) are documented as
+    `strict=False` at the call site; everything else must succeed for ALL
+    requested edges. If a strict site silently degrades — e.g. someone
+    nudges a parameter and a previously-working fillet starts conflicting —
+    the build aborts so the regression surfaces here, not on a print.
+    """
+    if not _dfm_log:
+        return
+    print("\nDFM operations:")
+    print(f"  {'site':<28} {'kind':<8} {'size':>5}  {'ok/req':>7}  mode")
+    failures: list[dict] = []
+    for e in _dfm_log:
+        mode = "strict" if e["strict"] else "best-effort"
+        marker = ""
+        if e["skip"] > 0:
+            marker = f"  -{e['skip']} skipped"
+            if e["strict"]:
+                marker += "  ✗"
+                failures.append(e)
+        print(f"  {e['label']:<28} {e['kind']:<8} {e['size']:>5.2f}  "
+              f"{e['ok']:>3}/{e['requested']:<3}  {mode:<11}{marker}")
+    if failures:
+        names = ", ".join(f["label"] for f in failures)
+        raise SystemExit(
+            f"\nFATAL: strict DFM operation(s) lost edges to OCCT: {names}.\n"
+            "A guarantee in the README's DFM table has regressed. Investigate "
+            "the geometry change before trusting the print. To accept the "
+            "regression deliberately, mark the call site `strict=False` and "
+            "update the README's DFM table to match."
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -366,7 +434,7 @@ with BuildPart() as trough_b:
     # Done BEFORE version engraving so the Z=0 edge filter only catches the
     # four flange-perimeter edges (text outlines come next).
     bot_edges = trough_b.edges().filter_by_position(Axis.Z, -0.01, 0.01)
-    try_chamfer(list(bot_edges), flange_bot_cham, "flange bottom")
+    try_chamfer(list(bot_edges), flange_bot_cham, "flange bottom", strict=True)
 
     # --- Version label (engraved recess on +Y flange overhang) -------------
     # Located on the apartment-facing face (Z=0), centered within the 10 mm
@@ -433,7 +501,10 @@ with BuildPart() as trough_b:
     # Corner "shelf" arcs after: they sit between a cylindrical body-corner
     # surface and the flange top, so OCCT often refuses both fillet and
     # chamfer at larger radii. We fall back chamfer→smaller radius→skip.
-    try_fillet(step_straight, flange_step_fil, "flange step")
+    try_fillet(step_straight, flange_step_fil, "flange step", strict=True)
+    # Flange-corner shelfs sit between the cylindrical 2 mm body-corner fillet
+    # and the flat flange top — OCCT refuses both fillet and chamfer on this
+    # tangent conflict (documented in the README DFM table). Best-effort only.
     if not try_fillet(step_arcs, flange_top_cham, "flange corner")[0]:
         if not try_chamfer(step_arcs, flange_top_cham, "flange corner")[0]:
             try_chamfer(step_arcs, 0.3, "flange corner (fallback 0.3)")
@@ -457,7 +528,7 @@ with BuildPart() as trough_b:
         if (abs(c.X) <= cavity_x / 2 + 0.1
                 and abs(c.Y) <= cavity_y / 2 + 0.1):
             cavity_floor_edges.append(e)
-    try_fillet(cavity_floor_edges, cavity_floor_fil, "cavity floor")
+    try_fillet(cavity_floor_edges, cavity_floor_fil, "cavity floor", strict=True)
 
     # Rabbet: widen cavity at top by shelf_w per side, depth = rabbet_depth
     with BuildSketch(Plane.XY.offset(size_z)) as _:
@@ -479,7 +550,7 @@ with BuildPart() as trough_b:
         if (abs(c.X) <= rabbet_x / 2 + 0.1
                 and abs(c.Y) <= rabbet_y / 2 + 0.1):
             rabbet_edges.append(e)
-    try_fillet(rabbet_edges, rabbet_fil, "rabbet")
+    try_fillet(rabbet_edges, rabbet_fil, "rabbet", strict=True)
 
     # Permanent internal anti-spread ties. Each bar is fused into both long
     # X walls, so wall spread puts the bar in tension instead of relying on
@@ -705,7 +776,10 @@ with BuildPart() as lid_b:
             lid_top_perim.append(e)
         elif abs(c.Z - lid_bot_z) < 0.01:
             lid_bot_perim.append(e)
-    try_chamfer(lid_top_perim, lid_top_cham, "lid top perim")
+    try_chamfer(lid_top_perim, lid_top_cham, "lid top perim", strict=True)
+    # Lid-bottom perimeter overlaps the +X snap-arm root fillets and the -X
+    # hook-rail attach: OCCT accepts only the -Y / +Y straights. Documented
+    # in the README DFM table as a partial-success site.
     try_chamfer(lid_bot_perim, lid_bot_cham, "lid bot perim")
 
     # Dedicated chamfer on the pull lip so the fingertip contact edge isn't
@@ -741,10 +815,17 @@ with BuildPart() as lid_b:
         if (abs(abs(c.X) - lid_x / 2) < 0.1
                 and abs(abs(c.Y) - lid_y / 2) < 0.1):
             lid_corner_edges.append(e)
-    try_fillet(lid_corner_edges, lid_corner_fil, "lid corner")
+    try_fillet(lid_corner_edges, lid_corner_fil, "lid corner", strict=True)
 
 assert lid_b.part is not None
 lid = lid_b.part
+
+
+# ---------------------------------------------------------------------------
+# DFM summary — surfaces silent regressions in the README's DFM-table
+# guarantees. Aborts the run if a strict site lost edges to OCCT.
+# ---------------------------------------------------------------------------
+_print_dfm_summary()
 
 
 # ---------------------------------------------------------------------------

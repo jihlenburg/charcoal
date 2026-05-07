@@ -1,0 +1,40 @@
+{
+  "best_pose": {
+    "angle_deg": -10.0,
+    "dx_mm": 0.4,
+    "dz_mm": 1.2,
+    "feasible": true,
+    "max_penetration_mm": -0.1629955739219504,
+    "penetrating_points": 0,
+    "plus_edge_lift_mm": 9.223567742185168
+  },
+  "closing_path": {
+    "end_dz_mm": 0.0,
+    "feasible": true,
+    "hard_max_penetration_mm": 0.0,
+    "hard_penetrating_points": 0,
+    "max_penetration_mm": 0.9371764742621203,
+    "penetrating_points": 4,
+    "snap_max_interference_mm": 0.9371764742621203,
+    "start_angle_deg": -10.0,
+    "start_dx_mm": 0.4,
+    "start_dz_mm": 1.2
+  },
+  "critical_points": 180,
+  "penetration_tol_mm": 0.15,
+  "summary": "A plausible hook-first assembly path was found: passive side hook engaged at a negative Y-rotation, then rotate down without unexpected hard interference.",
+  "tilt_insert_possible": true,
+  "version": "1.1.6",
+  "vertical_entry_path": {
+    "end_dz_mm": 1.2,
+    "feasible": true,
+    "hard_max_penetration_mm": -0.1629955739219504,
+    "hard_penetrating_points": 0,
+    "max_penetration_mm": -0.1629955739219504,
+    "penetrating_points": 0,
+    "snap_max_interference_mm": -1000000000.0,
+    "start_angle_deg": -10.0,
+    "start_dx_mm": 0.4,
+    "start_dz_mm": 4.2
+  }
+}
